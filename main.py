@@ -1,14 +1,6 @@
 import pygame
-
-
-class Menu:
-    def __init__(self):
-        pass
-
-    def click(self, x, y):
-        pass
-
-
+from menu_start import Menu_2
+from func_load_image import load_image
 import pygame  # импорт библиотеки PyGame
 
 pygame.init()  # инициализируем PyGame
@@ -18,26 +10,18 @@ HEIGHT = 1080  # высота экрана
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))  # создаем поверхность экрана
 
-# running = True
-# while running:
-#     for e in pygame.event.get():  # перебираем события
-#         if e.type == pygame.QUIT:  # если тип события выход из игры, то
-#             running = False
-#
-#     # код для обновления и отрисовки здесь
-#
-#     pygame.display.flip()  # обновляем экран
-#
-# pygame.quit()
-
 current_scene = None
-
+image = "zamok_gorod_fentezi_174584_1920x1080.jpg"
 
 def switch_scene(scene):
     global current_scene
     current_scene = scene
 
-def scene1():
+
+def Menu_draw():
+    menu = Menu_2()
+    menu.append_option('Hello world', lambda: print('Hello world'))
+    menu.append_option('закрытие', quit)
     running = True
     while running:
         for e in pygame.event.get():
@@ -45,9 +29,17 @@ def scene1():
                 running = False
                 switch_scene(None)
             elif e.type == pygame.KEYDOWN:
-                switch_scene(scene2)
-                running = False
-        screen.fill((255, 0, 0))
+                if e.key == pygame.K_q:
+                    switch_scene(scene2)
+                    running = False
+                elif e.key == pygame.K_w:
+                    menu.switch(-1)
+                elif e.key == pygame.K_s:
+                    menu.switch(1)
+                elif e.key == pygame.K_SPACE:
+                    menu.select()
+        screen.blit(load_image(image), (10, 10))
+        menu.draw(screen, 800, 400, 75)
         pygame.display.flip()
 
 
@@ -59,13 +51,14 @@ def scene2():
                 running = False
                 switch_scene(None)
             elif e.type == pygame.KEYDOWN:
-                switch_scene(scene1)
-                running = False
+                if e.key == pygame.K_q:
+                    switch_scene(Menu_draw)
+                    running = False
         screen.fill((0, 255, 0))
         pygame.display.flip()
 
 
-switch_scene(scene1)
+switch_scene(Menu_draw)
 while current_scene is not None:
     current_scene()
 pygame.quit()
