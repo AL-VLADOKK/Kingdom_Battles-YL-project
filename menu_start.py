@@ -35,9 +35,7 @@ class Menu_2:
         surf.blit(image, rect)
         for i, option in enumerate(self.option_surface):
             option_rect = option.get_rect()
-            print(option_rect)
             option_rect.topleft = (x, y + i * padding)
-            print(option_rect)
             if i == self.index:
                 pygame.draw.rect(surf, (0, 0, 100), option_rect)
             surf.blit(option, option_rect)
