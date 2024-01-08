@@ -13,18 +13,24 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))  # создаем поверх
 current_scene = None
 image = "zamok_gorod_fentezi_174584_1920x1080.jpg"
 
+
 def switch_scene(scene):
     global current_scene
     current_scene = scene
 
 
-def Menu_draw():
+def menu_draw():
     menu = Menu_2()
     menu.append_option('Hello world', lambda: print('Hello world'))
     menu.append_option('закрытие', quit)
+    menu.append_option(' world', lambda: print(' world'))
     running = True
+    screen.blit(load_image(image), (10, 10))
+    menu.draw(screen, 800, 400, 75)
     while running:
         for e in pygame.event.get():
+            if e.type == pygame.MOUSEBUTTONDOWN:
+                menu.click(e.pos)
             if e.type == pygame.QUIT:
                 running = False
                 switch_scene(None)
@@ -52,13 +58,13 @@ def scene2():
                 switch_scene(None)
             elif e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_q:
-                    switch_scene(Menu_draw)
+                    switch_scene(menu_draw)
                     running = False
         screen.fill((0, 255, 0))
         pygame.display.flip()
 
 
-switch_scene(Menu_draw)
+switch_scene(menu_draw)
 while current_scene is not None:
     current_scene()
 pygame.quit()
