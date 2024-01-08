@@ -1,5 +1,5 @@
 import pygame
-from menu_start import Menu_2
+from menu_start import Menu
 from func_load_image import load_image
 import pygame  # импорт библиотеки PyGame
 
@@ -20,7 +20,7 @@ def switch_scene(scene):
 
 
 def menu_draw():
-    menu = Menu_2()
+    menu = Menu()
     menu.append_option('Hello world', lambda: print('Hello world'))
     menu.append_option('закрытие', quit)
     menu.append_option(' world', lambda: print(' world'))

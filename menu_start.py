@@ -3,14 +3,6 @@ from func_load_image import load_image
 
 
 class Menu:
-    def __init__(self):
-        pass
-
-    def click(self, x, y):
-        pass
-
-
-class Menu_2:
     link_image = 'scroll.png'
 
     # 2й вариант меню
