@@ -29,6 +29,7 @@ def basic_menu_draw():
         for e in pygame.event.get():
             if e.type == pygame.MOUSEBUTTONDOWN:
                 menu.click(e.pos)
+                running = False
             if e.type == pygame.QUIT:
                 running = False
                 switch_scene(None)
@@ -56,6 +57,7 @@ def menu_draw():
     while running:
         for e in pygame.event.get():
             if e.type == pygame.MOUSEBUTTONDOWN:
+                running = False
                 menu.click(e.pos)
             if e.type == pygame.QUIT:
                 running = False
