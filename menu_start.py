@@ -3,7 +3,6 @@ from func_load_image import load_image
 
 
 class Menu:
-    link_image = 'scroll.png'
 
     # 2й вариант меню
     def __init__(self):
@@ -24,11 +23,6 @@ class Menu:
         self.defs[self.index]()
 
     def draw(self, surf, x, y, padding):
-        image = load_image(Menu_2.link_image)
-        image = pygame.transform.scale(image, (350, 200 + len(self.option_surface) * padding))
-        rect = image.get_rect()
-        rect = rect.move((x - 80, y - 90))
-        surf.blit(image, rect)
         for i, option in enumerate(self.option_surface):
             option_rect = option.get_rect()
             option_rect.topleft = (x, y + i * padding)
@@ -43,3 +37,15 @@ class Menu:
                 self.index = self.coords_options_surface.index(option_rect)
                 self.select()
                 break
+
+
+class BasicMenu(Menu):
+    link_image = 'scroll.png'
+
+    def draw(self, surf, x, y, padding):
+        image = load_image(BasicMenu.link_image)
+        image = pygame.transform.scale(image, (350, 200 + len(self.option_surface) * padding))
+        rect = image.get_rect()
+        rect = rect.move((x - 80, y - 90))
+        surf.blit(image, rect)
+        super().draw(surf, x, y, padding)

@@ -1,5 +1,4 @@
-import pygame
-from menu_start import Menu
+from menu_start import Menu, BasicMenu
 from func_load_image import load_image
 import pygame  # импорт библиотеки PyGame
 
@@ -19,13 +18,12 @@ def switch_scene(scene):
     current_scene = scene
 
 
-def menu_draw():
-    menu = Menu()
-    menu.append_option('Hello world', lambda: print('Hello world'))
-    menu.append_option('закрытие', quit)
-    menu.append_option(' world', lambda: print(' world'))
+def basic_menu_draw():
+    menu = BasicMenu()
+    menu.append_option('1 VS 1', lambda: switch_scene(menu_draw))
+    menu.append_option('Выйти из игры', quit)
     running = True
-    screen.blit(load_image(image), (10, 10))
+    screen.blit(load_image(image), (0, 0))
     menu.draw(screen, 800, 400, 75)
     while running:
         for e in pygame.event.get():
@@ -35,21 +33,47 @@ def menu_draw():
                 running = False
                 switch_scene(None)
             elif e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_q:
-                    switch_scene(scene2)
-                    running = False
-                elif e.key == pygame.K_w:
+                if e.key == pygame.K_w:
                     menu.switch(-1)
                 elif e.key == pygame.K_s:
                     menu.switch(1)
                 elif e.key == pygame.K_SPACE:
                     menu.select()
-        screen.blit(load_image(image), (10, 10))
+                    running = False
+        screen.blit(load_image(image), (0, 0))
         menu.draw(screen, 800, 400, 75)
         pygame.display.flip()
 
 
-def scene2():
+def menu_draw():
+    menu = BasicMenu()
+    menu.append_option('Играть', lambda: switch_scene(game_world_draw))
+    menu.append_option('Выбрать карту', lambda: quit)
+    menu.append_option('Вернуться', lambda: switch_scene(basic_menu_draw))
+    running = True
+    screen.blit(load_image(image), (0, 0))
+    menu.draw(screen, 800, 400, 75)
+    while running:
+        for e in pygame.event.get():
+            if e.type == pygame.MOUSEBUTTONDOWN:
+                menu.click(e.pos)
+            if e.type == pygame.QUIT:
+                running = False
+                switch_scene(None)
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_w:
+                    menu.switch(-1)
+                elif e.key == pygame.K_s:
+                    menu.switch(1)
+                elif e.key == pygame.K_SPACE:
+                    menu.select()
+                    running = False
+        screen.blit(load_image(image), (0, 0))
+        menu.draw(screen, 800, 400, 75)
+        pygame.display.flip()
+
+
+def game_world_draw(*args):
     running = True
     while running:
         for e in pygame.event.get():
@@ -64,7 +88,7 @@ def scene2():
         pygame.display.flip()
 
 
-switch_scene(menu_draw)
+switch_scene(basic_menu_draw)
 while current_scene is not None:
     current_scene()
 pygame.quit()
