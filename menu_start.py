@@ -12,7 +12,7 @@ class Menu:
         self.coords_options_surface = []
 
     def append_option(self, option, deff):  # добавить пункт
-        self.option_surface.append(pygame.font.SysFont('arial', 50).render(option, True, (255, 255, 255)))
+        self.option_surface.append(pygame.font.SysFont('arial', 44).render(option, True, (255, 255, 255)))
         self.defs.append(deff)
 
     def switch(self, direction):  # перемещение по меню
@@ -44,7 +44,7 @@ class BasicMenu(Menu):
 
     def draw(self, surf, x, y, padding):
         image = load_image(BasicMenu.link_image)
-        image = pygame.transform.scale(image, (350, 200 + len(self.option_surface) * padding))
+        image = pygame.transform.scale(image, (400, 200 + len(self.option_surface) * padding))
         rect = image.get_rect()
         rect = rect.move((x - 80, y - 90))
         surf.blit(image, rect)
