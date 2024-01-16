@@ -124,9 +124,8 @@ class World:
             World.link_on_hero_2_animation, 'B', hero_1)
 
         self.world = [
-            [World.dict_objects_map[ii] if ii != 'A' or ii != 'B' else self.hero_1 if ii == 'A' else self.hero_2 for ii
+            [World.dict_objects_map[ii]() if ii != 'A' or ii != 'B' else self.hero_1 if ii == 'A' else self.hero_2 for ii
              in i] for i in self.map]
-    def draw_world(self):
 
 
 class Chunk:
