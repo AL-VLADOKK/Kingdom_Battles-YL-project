@@ -1,5 +1,6 @@
 from menu_start import BasicMenu
 from func_load_image import load_image
+from buton import ImageButton
 import pygame  # импорт библиотеки PyGame
 
 pygame.init()  # инициализируем PyGame
@@ -11,6 +12,28 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))  # создаем поверх
 
 current_scene = print
 image = "zamok_gorod_fentezi_174584_1920x1080.jpg"
+
+img_objects_map = {'A': load_image('hero1.png', colorkey=-1),
+                   'B': load_image('hero2.png', colorkey=-1),
+                   '#': load_image('kust.png'),
+                   '-': load_image('1626746394_9-kartinkin-com-p-pikselnaya-tekstura-travi-krasivo-11.jpg'),
+                   '*': load_image('abstract-blue-painting-acrylic-texture-with-marble-pattern.jpg', colorkey=-1),
+                   '@': load_image('castle1.png', colorkey=-1),
+                   '$': load_image('castle2.png', colorkey=-1),
+                   'G': load_image('1677316897_foni-club-p-sunduk-piksel-art-1.png', colorkey=-1),
+                   'W': load_image('—Pngtree—wood log lumber pile cartoon_6955308.png', colorkey=-1),
+                   'R': load_image('photo1705405793.png', colorkey=-1),
+                   'M': load_image('kristal.png', colorkey=-1),
+                   'O': load_image('image0000.png', colorkey=-1),
+                   'K': load_image('b94adf7c5d21d13a83be3878336d0378.png', colorkey=-1),
+                   'I': load_image('klipartz.com.png', colorkey=-1),
+                   'F': load_image('gadalka.png', colorkey=-1),
+                   '1': load_image('as.png', colorkey=-1),
+                   '2': load_image('34174417_2210_w032_n002_608b_p15_608.png', colorkey=-1),
+                   '3': load_image('molot.png', colorkey=-1),
+                   '4': load_image('msg1331310743-41499.png', colorkey=-1),
+                   '5': load_image('70015845_JEMA GER 1640-02.png', colorkey=-1)
+                   }
 
 
 def switch_scene(scene):
@@ -115,34 +138,15 @@ def game_world_draw(*args):
     ret = args
     map = ret[0]
 
-    img_objects_map = {'A': load_image('hero.png'),
-                       'B': load_image('hero.png'),
-                       '#': load_image('kust.png'),
-                       '-': load_image('1626746394_9-kartinkin-com-p-pikselnaya-tekstura-travi-krasivo-11.jpg'),
-                       '*': load_image('abstract-blue-painting-acrylic-texture-with-marble-pattern.jpg'),
-                       '@': load_image('go_zamok.png'),
-                       '$': load_image('go_zamok.png'),
-                       'G': load_image('1677316897_foni-club-p-sunduk-piksel-art-1.png'),
-                       'W': load_image('—Pngtree—wood log lumber pile cartoon_6955308.png'),
-                       'R': load_image('photo1705405793.png'),
-                       'M': load_image('kristal.png'),
-                       'O': load_image('image0000.png'),
-                       'K': load_image('b94adf7c5d21d13a83be3878336d0378.png'),
-                       'I': load_image('klipartz.com.png'),
-                       'F': load_image('gadalka.png'),
-                       '1': load_image('as.png'),
-                       '2': load_image('34174417_2210_w032_n002_608b_p15_608.png'),
-                       '3': load_image('molot.png'),
-                       '4': load_image('msg1331310743-41499.png'),
-                       '5': load_image('70015845_JEMA GER 1640-02.png')
-                       }
-    size = [1000, 1000]
-    res = [500, 500]
+    size = [1920, 1080]
+    res = [480, 260]
 
     cam_x, cam_y = 0, 0
     global screen
-    screen = pygame.display.set_mode(size)
+    screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
     window = pygame.transform.scale(screen, res)
+    surface = pygame.display.get_surface()
+    size = [surface.get_width(), surface.get_height()]
 
     clock = pygame.time.Clock()
 
@@ -186,14 +190,30 @@ def game_world_draw(*args):
             self.x, self.y = x, y
 
         def render(self):
+            pas = False
             for y in range(chunk_size):
                 for x in range(chunk_size):
                     screen.blit(Chunk.trava, (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
-                    if map[self.n_tiel_y + y][self.n_tiel_x + x - 1] in 'AB':
+                    key = map[self.n_tiel_y + y][self.n_tiel_x + x - 1]
+                    if pas:
+                        key = map[self.n_tiel_y + y][self.n_tiel_x + x - 2]
+                        texture = pygame.transform.scale(
+                            img_objects_map[key],
+                            (tile_size * 3, tile_size * 3))
+                        screen.blit(texture,
+                                    (self.x + (x - 2) * tile_size - cam_x, self.y + (y - 2) * tile_size - cam_y))
+
+                        pas = False
+                        continue
+                    if key in 'AB':
+                        pass
+                    elif key in 'OKIF@$':
+                        pas = True
+                    elif key == '/':
                         pass
                     else:
                         texture = pygame.transform.scale(
-                            img_objects_map[map[self.n_tiel_y + y][self.n_tiel_x + x - 1]],
+                            img_objects_map[key],
                             (tile_size, tile_size))
                         screen.blit(texture, (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
 
@@ -204,6 +224,17 @@ def game_world_draw(*args):
             chunks.append(
                 Chunk((x * chunk_size, y * chunk_size), x * chunk_size * tile_size, y * chunk_size * tile_size))
 
+    buttons = [ImageButton(int(res[0] * 0.88), int(res[1] * 0.85), int(res[0] * 0.1), int(res[1] * 0.13), '',
+                           'photo1705490612.png', hover_image_path='photo1705490612_2.png',
+                           sound_path='data/musik/razrezayuschiy-udar-mechom.mp3')]
+    buttons.append(ImageButton(int(res[0] * 0.03), int(res[1] * 0.83), int(res[0] * 0.1), int(res[1] * 0.15), '',
+                               'pngwing.com.png', hover_image_path='pngwing_2.com.png',
+                               sound_path='data/musik/orkestr-tojdestvennyiy-akkord-s-trubami.mp3'))
+    buttons.append(ImageButton(int(res[0] * 0.85), int(res[1] * 0), int(res[0] * 0.15), int(res[1] * 0.1), 'Exit',
+                               '—Pngtree—buttons games button illustration_5544907.png',
+                               hover_image_path='—Pngtree—buttons games button illustration_5544907_2.png'))
+    sum_day = 0
+
     frame = 0
     while running:
         screen.fill((0, 0, 0))
@@ -212,7 +243,17 @@ def game_world_draw(*args):
                 running = False
                 switch_scene(None)
             elif e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_q:
+                if e.key == pygame.K_ESCAPE:
+                    running = False
+                    switch_scene(None)
+            for button in buttons:
+                button.handle_event(e)
+            if e.type == pygame.USEREVENT:
+                if e.button == buttons[0]:
+                    print('0')
+                elif e.button == buttons[1]:
+                    print('1')
+                elif e.button == buttons[2]:
                     switch_scene(menu_draw)
                     running = False
 
@@ -228,7 +269,9 @@ def game_world_draw(*args):
 
         for i in chunks_on_screen((cam_x, cam_y), chunk_size, tile_size, res, (world_size_chunk_x, world_size_chunk_y)):
             chunks[i].render()
-
+        for button in buttons:
+            button.check_hover([int(i * (res[n] / size[n])) for n, i in enumerate(pygame.mouse.get_pos())])
+            button.draw(screen)
         window.blit(pygame.transform.scale(screen, size), (0, 0))
         screen.blit(pygame.transform.scale(window, size), (0, 0))
         pygame.display.update()
