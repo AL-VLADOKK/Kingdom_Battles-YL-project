@@ -1,6 +1,4 @@
 import pygame
-import random
-from PIL import Image
 from func_load_image import load_image
 
 
@@ -36,7 +34,8 @@ class Hero:
         self.aurs_stable_hors = False
         self.construction = []  # сюда будут сохранятся ссылки на обьекты на карте или их кординаты, которые посещаются один раз(кузня, оружейник)
         self.course = (1, 1)  # направление героя (для тайлов) 1-1 вверх, 0-0 вниз 1-0 влево 0-1 вправо
-        self.sprite = AnimatedSprite(load_image("dragon_sheet8x2.png"), 8, 2, 50, 50)
+        self.sprite_stand = AnimatedSprite(load_image("dragon_sheet8x2.png", colorkey=-1), 1, 3, 50, 50)
+        self.sprite_stand = AnimatedSprite(load_image("dragon_sheet8x2.png", colorkey=-1), 1, 4, 50, 50)
 
     def construction_add(self, coords_cell):
         self.construction = self.construction + [coords_cell]
