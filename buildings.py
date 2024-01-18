@@ -1,6 +1,7 @@
 import pygame
 from reading_map import map_reading
 import sqlite3
+import os
 
 
 class Buildings:
@@ -12,7 +13,9 @@ class Buildings:
                 if j == 'O' or j == 'K' or j == 'I' or j == 'F':
                     coords = (j_index, i_index)
                     self.building[coords] = ['yes', j]
-        self.con = sqlite3.connect("GameDB.db3")
+        db = "GameDB.db3"
+        db = os.path.join('data/db', db)
+        self.con = sqlite3.connect(db)
 
 
 def usage(self, coords, turn):
@@ -71,11 +74,13 @@ def usage(self, coords, turn):
 class RedCastle:
     def __init__(self):
         self.building = {}
-        self.con = sqlite3.connect("GameDB.db3")
-        self.load_data()
+        db = "GameDB.db3"
+        db = os.path.join('data/db', db)
+        self.con = sqlite3.connect(db)
         self.list_l = ['lvl', 'horse_stable', 'marketplace', 'militia', 'pennies', 'swordmans', 'knights', 'archer',
                        'crossbowman', 'cleric', 'abbot', 'angel', 'horseman']
         self.buying_army = {}
+        self.load_data()
 
     def load_data(self):
         cur = self.con.cursor()
@@ -189,11 +194,13 @@ class RedCastle:
 class BlueCastle:
     def __init__(self):
         self.building = {}
-        self.con = sqlite3.connect("GameDB.db3")
-        self.load_data()
+        db = "GameDB.db3"
+        db = os.path.join('data/db', db)
+        self.con = sqlite3.connect(db)
         self.list_l = ['lvl', 'horse_stable', 'marketplace', 'militia', 'pennies', 'swordmans', 'knights', 'archer',
                        'crossbowman', 'cleric', 'abbot', 'angel', 'horseman']
         self.buying_army = {}
+        self.load_data()
 
     def load_data(self):
         cur = self.con.cursor()
