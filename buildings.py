@@ -69,6 +69,7 @@ def usage(self, coords, turn):
                         (trait, new_trait_value, user,))
         self.con.commit()
         cur.close()
+        self.building[coords] = ['no', self.building[coords][1]]
 
 
 class RedCastle:
