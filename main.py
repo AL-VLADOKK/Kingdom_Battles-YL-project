@@ -226,11 +226,11 @@ def game_world_draw(*args):
                         continue
                     if key in 'AB':
                         if key == 'A':
-                            screen.blit(hero1_animated.image,
-                                        (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
+                            texture = pygame.transform.scale(hero1_animated.image, (tile_size, tile_size))
+                            screen.blit(texture, (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
                         else:
-                            screen.blit(hero2_animated.image,
-                                        (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
+                            texture = pygame.transform.scale(hero2_animated.image, (tile_size, tile_size))
+                            screen.blit(texture, (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
                     elif key in 'OKIF@$':
                         pas = True
                     elif key == '/':
@@ -250,21 +250,27 @@ def game_world_draw(*args):
 
     buttons = [ImageButton(int(res[0] * 0.88), int(res[1] * 0.85), int(res[0] * 0.1), int(res[1] * 0.13), '',
                            'photo1705490612.png', hover_image_path='photo1705490612_2.png',
-                           sound_path='data/musik/razrezayuschiy-udar-mechom.mp3')]
-    buttons.append(ImageButton(int(res[0] * 0.03), int(res[1] * 0.83), int(res[0] * 0.1), int(res[1] * 0.15), '',
-                               'pngwing.com.png', hover_image_path='pngwing_2.com.png',
-                               sound_path='data/musik/orkestr-tojdestvennyiy-akkord-s-trubami.mp3'))
-    buttons.append(ImageButton(int(res[0] * 0.85), int(res[1] * 0), int(res[0] * 0.15), int(res[1] * 0.1), 'Exit',
-                               '—Pngtree—buttons games button illustration_5544907.png',
-                               hover_image_path='—Pngtree—buttons games button illustration_5544907_2.png'))
+                           sound_path='data/musik/razrezayuschiy-udar-mechom.mp3'),
+               ImageButton(int(res[0] * 0.03), int(res[1] * 0.83), int(res[0] * 0.1), int(res[1] * 0.15), '',
+                           'pngwing.com.png', hover_image_path='pngwing_2.com.png',
+                           sound_path='data/musik/orkestr-tojdestvennyiy-akkord-s-trubami.mp3'),
+               ImageButton(int(res[0] * 0.85), int(res[1] * 0), int(res[0] * 0.15), int(res[1] * 0.1), 'Exit',
+                           '—Pngtree—buttons games button illustration_5544907.png',
+                           hover_image_path='—Pngtree—buttons games button illustration_5544907_2.png'),
+               ImageButton(int(res[0] * 0.78), int(res[1] * 0.85), int(res[0] * 0.1), int(res[1] * 0.13), '',
+                           'pixel-castle-for-games-and-web-sites-400-111240444.png',
+                           hover_image_path='pixel-castle_2-for-games-and-web-sites-400-111240444.png',
+                           sound_path='data/musik/torjestvennyiy-zvuk-fanfar.mp3')
+               ]
+
     sum_day = 0
     flag_player = True
 
     def hero_coords(map):
         a = False
         b = False
-        for i in range(map):
-            for ii in range(map[0]):
+        for i in range(len(map)):
+            for ii in range(len(map[0])):
                 find = map[i][ii]
                 if find in 'AB':
                     if find == 'A':
@@ -277,8 +283,8 @@ def game_world_draw(*args):
                 return a, b
 
     hero_1_coords, hero_2_coords = hero_coords(map)
-    players_hero = [Hero('A', 0, 0, hero_1_coords, ),
-                    Hero('B', 0, 0, hero_2_coords, )]  # !!!!! нужно подключить базу и заполнить характеристикигероев
+    # players_hero = [Hero('A', 0, 0, hero_1_coords, ),
+    #                 Hero('B', 0, 0, hero_2_coords, )]  # !!!!! нужно подключить базу и заполнить характеристикигероев
 
     frame = 0
     while running:
@@ -311,6 +317,8 @@ def game_world_draw(*args):
                 elif e.button == buttons[2]:
                     switch_scene(basic_menu_draw)
                     running = False
+                elif e.button == buttons[3]:
+                    print(4)
 
         key = pygame.key.get_pressed()
         if key[pygame.K_a]:
@@ -331,7 +339,7 @@ def game_world_draw(*args):
         window.blit(pygame.transform.scale(screen, size), (0, 0))
         screen.blit(pygame.transform.scale(window, size), (0, 0))
         pygame.display.update()
-        clock.tick(480)
+        clock.tick(408)
 
         frame += 1
         if frame % 4 == 0:
