@@ -1,6 +1,7 @@
 from menu_start import BasicMenu
 from func_load_image import load_image
 from buton import ImageButton
+from shablon import Hero, AnimatedSprite
 import pygame  # импорт библиотеки PyGame
 
 pygame.init()  # инициализируем PyGame
@@ -11,6 +12,7 @@ HEIGHT = 1080  # высота экрана
 screen = pygame.display.set_mode((WIDTH, HEIGHT))  # создаем поверхность экрана
 
 current_scene = print
+fon_download = 'fon_download.png'
 image = "zamok_gorod_fentezi_174584_1920x1080.jpg"
 
 img_objects_map = {'A': load_image('hero1.png', colorkey=-1),
@@ -58,7 +60,10 @@ def setting_screen():
                 running = False
                 switch_scene(None)
             elif e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_w:
+                if e.key == pygame.K_ESCAPE:
+                    running = False
+                    switch_scene(None)
+                elif e.key == pygame.K_w:
                     menu.switch(-1)
                 elif e.key == pygame.K_s:
                     menu.switch(1)
@@ -90,7 +95,10 @@ def basic_menu_draw(*args):
                 running = False
                 switch_scene(None)
             elif e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_w:
+                if e.key == pygame.K_ESCAPE:
+                    running = False
+                    switch_scene(None)
+                elif e.key == pygame.K_w:
                     menu.switch(-1)
                 elif e.key == pygame.K_s:
                     menu.switch(1)
@@ -122,7 +130,10 @@ def menu_draw(*args):
                 running = False
                 switch_scene(None)
             elif e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_w:
+                if e.key == pygame.K_ESCAPE:
+                    running = False
+                    switch_scene(None)
+                elif e.key == pygame.K_w:
                     menu.switch(-1)
                 elif e.key == pygame.K_s:
                     menu.switch(1)
@@ -156,9 +167,17 @@ def game_world_draw(*args):
     r = open(f'{map}', mode="r").readlines()
     map = [i.rstrip() + '#' * (chunk_size - len(map[0][:-3]) % chunk_size) for i in r]
     map = map + ['#' * len(map[0])] * (chunk_size - len(map) % chunk_size)
+    one_player_fog_war = [[False for __ in _] for _ in map]
+    two_player_fog_war = [[False for __ in _] for _ in map]
 
     world_size_chunk_x = len(map[0]) // chunk_size
     world_size_chunk_y = len(map) // chunk_size
+
+    link_sprites_hero1 = 'hero1_standing.png'
+    link_sprites_hero2 = 'hero2_standing.png'
+
+    hero1_animated = AnimatedSprite(load_image(link_sprites_hero1, colorkey=-1), 3, 1, 19, 20)
+    hero2_animated = AnimatedSprite(load_image(link_sprites_hero2, colorkey=-1), 3, 1, 19, 20)
 
     def chunks_on_screen(cam, chunk_size, tile_size, res, world_size_chunk):
         x1 = cam[0] // (chunk_size * tile_size)
@@ -206,7 +225,12 @@ def game_world_draw(*args):
                         pas = False
                         continue
                     if key in 'AB':
-                        pass
+                        if key == 'A':
+                            screen.blit(hero1_animated.image,
+                                        (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
+                        else:
+                            screen.blit(hero2_animated.image,
+                                        (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
                     elif key in 'OKIF@$':
                         pas = True
                     elif key == '/':
@@ -234,10 +258,32 @@ def game_world_draw(*args):
                                '—Pngtree—buttons games button illustration_5544907.png',
                                hover_image_path='—Pngtree—buttons games button illustration_5544907_2.png'))
     sum_day = 0
+    flag_player = True
+
+    def hero_coords(map):
+        a = False
+        b = False
+        for i in range(map):
+            for ii in range(map[0]):
+                find = map[i][ii]
+                if find in 'AB':
+                    if find == 'A':
+                        a = find
+                        continue
+                    else:
+                        b = find
+                        continue
+            if a and b:
+                return a, b
+
+    hero_1_coords, hero_2_coords = hero_coords(map)
+    players_hero = [Hero('A', 0, 0, hero_1_coords, ),
+                    Hero('B', 0, 0, hero_2_coords, )]  # !!!!! нужно подключить базу и заполнить характеристикигероев
 
     frame = 0
     while running:
-        screen.fill((0, 0, 0))
+        flag_player = not flag_player
+        screen.blit(load_image(fon_download), (0, 0))
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 running = False
@@ -246,6 +292,15 @@ def game_world_draw(*args):
                 if e.key == pygame.K_ESCAPE:
                     running = False
                     switch_scene(None)
+                elif e.key == pygame.K_UP or e.key == pygame.K_KP8:
+                    pass
+                elif e.key == pygame.K_DOWN or e.key == pygame.K_KP2:
+                    pass
+                elif e.key == pygame.K_LEFT or e.key == pygame.K_KP4:
+                    pass
+                elif e.key == pygame.K_RIGHT or e.key == pygame.K_KP6:
+                    pass
+
             for button in buttons:
                 button.handle_event(e)
             if e.type == pygame.USEREVENT:
@@ -254,7 +309,7 @@ def game_world_draw(*args):
                 elif e.button == buttons[1]:
                     print('1')
                 elif e.button == buttons[2]:
-                    switch_scene(menu_draw)
+                    switch_scene(basic_menu_draw)
                     running = False
 
         key = pygame.key.get_pressed()
@@ -269,6 +324,7 @@ def game_world_draw(*args):
 
         for i in chunks_on_screen((cam_x, cam_y), chunk_size, tile_size, res, (world_size_chunk_x, world_size_chunk_y)):
             chunks[i].render()
+
         for button in buttons:
             button.check_hover([int(i * (res[n] / size[n])) for n, i in enumerate(pygame.mouse.get_pos())])
             button.draw(screen)
@@ -278,6 +334,12 @@ def game_world_draw(*args):
         clock.tick(480)
 
         frame += 1
+        if frame % 4 == 0:
+            if flag_player:
+                hero1_animated.update()
+            else:
+                hero2_animated.update()
+
         if frame % 100 == 0:
             pygame.display.set_caption('FPS: ' + str(round(clock.get_fps())))
             chunks_on_screen((cam_x, cam_y), chunk_size, tile_size, res, (world_size_chunk_x, world_size_chunk_y))

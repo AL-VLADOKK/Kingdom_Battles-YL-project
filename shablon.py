@@ -1,5 +1,6 @@
 import pygame
 from func_load_image import load_image
+import random
 
 
 class AnimatedSprite(pygame.sprite.Sprite):
@@ -25,20 +26,53 @@ class AnimatedSprite(pygame.sprite.Sprite):
         self.image = self.frames[self.cur_frame]
 
 
+def random_two_nubers(sum, min):
+    a = random.randint(min, sum - min)
+    b = sum - a
+    return (a, b)
+
+
 class Hero:
+    link_on_sprites_standing = 'hero_standing1.png'
+    coast_lvl_up_exp = [10, 30, 60, 100, 150, 220, 330, 500, 700, 1000]
+    sum_give_characteristics = [1, 1, 2, 2, 2, 3, 3, 3, 3, 4]
+    give_characteristics = {0: lambda: random_two_nubers(1, 0) + (0, 0),
+                            1: lambda: random_two_nubers(1, 0) + (0, 0),
+                            2: lambda: random_two_nubers(1, 0) + (0, 0),
+                            3: lambda: random_two_nubers(2, 0) + (0, 0),
+                            4: lambda: random_two_nubers(2, 0) + random_two_nubers(1, 0),
+                            5: lambda: random_two_nubers(3, 1) + (0, 0),
+                            6: lambda: random_two_nubers(3, 1) + (0, 0),
+                            7: lambda: random_two_nubers(3, 1) + (0, 0),
+                            8: lambda: random_two_nubers(3, 1) + (0, 0),
+                            9: lambda: random_two_nubers(4, 1) + random_two_nubers(2, 0)}
+
     def __init__(self, *args):
-        self.link_on_hero_animation, self.number, characteristics = args
+        self.number, self.level, self.exp,self.coords, characteristics = args
         self.name, self.motion, self.attack, self.protection, self.inspiration, self.luck, self.slot_1, self.slot_2, self.slot_3, self.slot_4 = characteristics
         self.slots_army = [None, None, None, None, None, None]
         self.slots_artefacts = [None, None, None, None]
         self.aurs_stable_hors = False
         self.construction = []  # сюда будут сохранятся ссылки на обьекты на карте или их кординаты, которые посещаются один раз(кузня, оружейник)
         self.course = (1, 1)  # направление героя (для тайлов) 1-1 вверх, 0-0 вниз 1-0 влево 0-1 вправо
-        self.sprite_stand = AnimatedSprite(load_image("dragon_sheet8x2.png", colorkey=-1), 1, 3, 50, 50)
-        self.sprite_stand = AnimatedSprite(load_image("dragon_sheet8x2.png", colorkey=-1), 1, 4, 50, 50)
+        self.sprite_stand = AnimatedSprite(load_image(Hero.link_on_sprites_standing, colorkey=-1), 1, 3, 50, 50)
 
-    def construction_add(self, coords_cell):
-        self.construction = self.construction + [coords_cell]
+    def give_exp(self, exp):
+        self.exp += exp
+        if self.exp >= Hero.coast_lvl_up_exp[self.level]:
+            if self.level < 9:
+                self.exp = 0
+                self.level += 1
+                self.level_up()
+            else:
+                self.exp = Hero.coast_lvl_up_exp[9]
+
+    def level_up(self):
+        a, p, i, l = Hero.give_characteristics[self.level]
+        self.attack += a
+        self.protection += p
+        self.inspiration += i
+        self.luck += l
 
     link_on_hero_1_animation = ['', '', '', '', '']
     link_on_hero_2_animation = ['', '', '', '', '']
