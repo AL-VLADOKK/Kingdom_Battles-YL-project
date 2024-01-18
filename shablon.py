@@ -1,7 +1,6 @@
-import pygame
+import pygame, os, sqlite3
 from func_load_image import load_image
 import random
-
 
 class AnimatedSprite(pygame.sprite.Sprite):
     def __init__(self, sheet, columns, rows, x, y):
@@ -56,6 +55,23 @@ class Hero:
         self.construction = []  # сюда будут сохранятся ссылки на обьекты на карте или их кординаты, которые посещаются один раз(кузня, оружейник)
         self.course = (1, 1)  # направление героя (для тайлов) 1-1 вверх, 0-0 вниз 1-0 влево 0-1 вправо
         self.sprite_stand = AnimatedSprite(load_image(Hero.link_on_sprites_standing, colorkey=-1), 1, 3, 50, 50)
+
+        db = "GameDB.db3"
+        db = os.path.join('data/db', db)
+        self.con = sqlite3.connect(db)
+
+        cur = self.con.cursor()
+        result = cur.execute("""SELECT * FROM heroes WHERE id = ?""", (self.number,)).fetchone()
+        self.name = result[1]
+        self.motion = result[2]
+        self.attack = result[3]
+        self.protection = result[4]
+        self.inspiration = result[5]
+        self.luck = result[6]
+        self.slot_1 = result[7]
+        self.slot_2 = result[8]
+        self.slot_3 = result[9]
+        self.slot_4 = result[10]
 
     def give_exp(self, exp):
         self.exp += exp
