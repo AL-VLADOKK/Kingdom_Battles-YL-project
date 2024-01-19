@@ -266,9 +266,10 @@ def game_world_draw(*args):
     sum_day = 0
     flag_player = True
 
-    players_hero = [Hero('A', 2), Hero('B', 3)]  # !!!!! нужно подключить базу и заполнить характеристикигероев
+    players_hero = [Hero('A', 2), Hero('B', 3)]  # !!!!! нужно подключить армию
     players_hero[0].find_hero_coords(map)
     players_hero[1].find_hero_coords(map)
+    steps_current_hero = players_hero[0 if flag_player else 1].give_hero_steps()
 
     frame = 0
     while running:
@@ -288,44 +289,59 @@ def game_world_draw(*args):
                     switch_scene(None)
                 elif e.key == pygame.K_UP or e.key == pygame.K_KP8:
                     chr_go = map[players_hero[id_hero].y_hero - 1][players_hero[id_hero].x_hero]
-                    if chr_go == '-':
+                    if chr_go == '-' and steps_current_hero:
+                        steps_current_hero -= 1
                         map[players_hero[id_hero].y_hero - 1][players_hero[id_hero].x_hero], \
                         map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                             map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
                             map[players_hero[id_hero].y_hero - 1][players_hero[id_hero].x_hero]
                         players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero - 1,
                                                               players_hero[id_hero].x_hero)
+                        if not (e.mod == pygame.KMOD_LSHIFT):
+                            cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
+                                        zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
 
                 elif e.key == pygame.K_DOWN or e.key == pygame.K_KP2:
                     chr_go = map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero]
-                    if chr_go == '-':
+                    if chr_go == '-' and steps_current_hero:
+                        steps_current_hero -= 1
                         map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero], \
                         map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                             map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
                             map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero]
                         players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero + 1,
                                                               players_hero[id_hero].x_hero)
+                        if not (e.mod == pygame.KMOD_LSHIFT):
+                            cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
+                                        zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
                 elif e.key == pygame.K_LEFT or e.key == pygame.K_KP4:
-                    print(players_hero[id_hero].chr, map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero])
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
-                    if chr_go == '-':
+                    if chr_go == '-' and steps_current_hero:
+                        steps_current_hero -= 1
                         map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1], \
                         map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                             map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
                             map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
                         players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero,
                                                               players_hero[id_hero].x_hero - 1)
+                        if not (e.mod == pygame.KMOD_LSHIFT):
+                            cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
+                                        zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
 
                 elif e.key == pygame.K_RIGHT or e.key == pygame.K_KP6:
 
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1]
-                    if chr_go == '-':
+                    if chr_go == '-' and steps_current_hero:
+                        steps_current_hero -= 1
                         map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1], \
                         map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                             map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
                             map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1]
                         players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero,
                                                               players_hero[id_hero].x_hero + 1)
+                        if not (e.mod == pygame.KMOD_LSHIFT):
+                            cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
+                                        zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
 
             for button in buttons:
                 button.handle_event(e)
@@ -334,6 +350,9 @@ def game_world_draw(*args):
                     print('0')
                 elif e.button == buttons[1]:
                     flag_player = not flag_player
+                    cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
+                                    zip(players_hero[::-1][id_hero].give_hero_coords(), res[::-1]))
+                    steps_current_hero = players_hero[::-1][id_hero].give_hero_steps()
                 elif e.button == buttons[2]:
                     switch_scene(basic_menu_draw)
                     running = False

@@ -62,7 +62,7 @@ class Hero:
         result = cur.execute("""SELECT * FROM heroes WHERE id = ?""", (self.id,)).fetchone()
         self.name = result[1]
         self.chr = 'A' if self.name == 'red_hero' else 'B'
-        self.motion = result[2]
+        self.steps = result[2]
         self.attack = result[3]
         self.protection = result[4]
         self.inspiration = result[5]
@@ -100,6 +100,14 @@ class Hero:
 
     def set_hero_coords(self, y, x):
         self.x_hero, self.y_hero = x, y
+
+    def give_hero_steps(self):
+        steps = int(self.steps * 1.5) if self.aurs_stable_hors else self.steps
+        self.aurs_stable_hors = max(0, self.aurs_stable_hors - 1)
+        return steps
+
+    def visited_the_stables(self):
+        self.aurs_stable_hors = 7
 
     link_on_hero_1_animation = ['', '', '', '', '']
     link_on_hero_2_animation = ['', '', '', '', '']
