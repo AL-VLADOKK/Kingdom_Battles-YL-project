@@ -24,7 +24,6 @@ class ImageButton:
 
     def draw(self, screen):
         current_image = self.hover_image if self.is_hovered else self.image
-        print(self.rect.topleft)
         screen.blit(current_image, self.rect.topleft)
         if self.text:
             font = pygame.font.Font(None, 36)

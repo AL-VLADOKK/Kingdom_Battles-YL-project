@@ -167,6 +167,7 @@ def game_world_draw(*args):
     r = open(f'{map}', mode="r").readlines()
     map = [i.rstrip() + '#' * (chunk_size - len(map[0][:-3]) % chunk_size) for i in r]
     map = map + ['#' * len(map[0])] * (chunk_size - len(map) % chunk_size)
+    map = [list(i) for i in map]
     one_player_fog_war = [[False for __ in _] for _ in map]
     two_player_fog_war = [[False for __ in _] for _ in map]
 
@@ -209,22 +210,21 @@ def game_world_draw(*args):
             self.x, self.y = x, y
 
         def render(self):
-            pas = False
+            pas = (False, (0, 0))
             for y in range(chunk_size):
                 for x in range(chunk_size):
                     screen.blit(Chunk.trava, (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
                     key = map[self.n_tiel_y + y][self.n_tiel_x + x - 1]
-                    if pas:
-                        key = map[self.n_tiel_y + y][self.n_tiel_x + x - 2]
+                    if pas[0]:
+                        key = map[self.n_tiel_y + pas[1][0]][self.n_tiel_x + pas[1][1] - 1]
                         texture = pygame.transform.scale(
                             img_objects_map[key],
                             (tile_size * 3, tile_size * 3))
                         screen.blit(texture,
-                                    (self.x + (x - 2) * tile_size - cam_x, self.y + (y - 2) * tile_size - cam_y))
-
-                        pas = False
-                        continue
-                    if key in 'AB':
+                                    (self.x + (pas[1][1] - 1) * tile_size - cam_x,
+                                     self.y + (pas[1][0] - 2) * tile_size - cam_y))
+                        pas = (False, (0, 0))
+                    elif key in 'AB':
                         if key == 'A':
                             texture = pygame.transform.scale(hero1_animated.image, (tile_size, tile_size))
                             screen.blit(texture, (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
@@ -232,7 +232,7 @@ def game_world_draw(*args):
                             texture = pygame.transform.scale(hero2_animated.image, (tile_size, tile_size))
                             screen.blit(texture, (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
                     elif key in 'OKIF@$':
-                        pas = True
+                        pas = (True, (y, x))
                     elif key == '/':
                         pass
                     else:
@@ -266,30 +266,18 @@ def game_world_draw(*args):
     sum_day = 0
     flag_player = True
 
-    def hero_coords(map):
-        a = False
-        b = False
-        for i in range(len(map)):
-            for ii in range(len(map[0])):
-                find = map[i][ii]
-                if find in 'AB':
-                    if find == 'A':
-                        a = find
-                        continue
-                    else:
-                        b = find
-                        continue
-            if a and b:
-                return a, b
-
-    hero_1_coords, hero_2_coords = hero_coords(map)
-    # players_hero = [Hero('A', 0, 0, hero_1_coords, ),
-    #                 Hero('B', 0, 0, hero_2_coords, )]  # !!!!! нужно подключить базу и заполнить характеристикигероев
+    players_hero = [Hero('A', 2), Hero('B', 3)]  # !!!!! нужно подключить базу и заполнить характеристикигероев
+    players_hero[0].find_hero_coords(map)
+    players_hero[1].find_hero_coords(map)
 
     frame = 0
     while running:
-        flag_player = not flag_player
+
         screen.blit(load_image(fon_download), (0, 0))
+        if flag_player:
+            id_hero = 0
+        else:
+            id_hero = 1
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 running = False
@@ -299,13 +287,45 @@ def game_world_draw(*args):
                     running = False
                     switch_scene(None)
                 elif e.key == pygame.K_UP or e.key == pygame.K_KP8:
-                    pass
+                    chr_go = map[players_hero[id_hero].y_hero - 1][players_hero[id_hero].x_hero]
+                    if chr_go == '-':
+                        map[players_hero[id_hero].y_hero - 1][players_hero[id_hero].x_hero], \
+                        map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
+                            map[players_hero[id_hero].y_hero - 1][players_hero[id_hero].x_hero]
+                        players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero - 1,
+                                                              players_hero[id_hero].x_hero)
+
                 elif e.key == pygame.K_DOWN or e.key == pygame.K_KP2:
-                    pass
+                    chr_go = map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero]
+                    if chr_go == '-':
+                        map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero], \
+                        map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
+                            map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero]
+                        players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero + 1,
+                                                              players_hero[id_hero].x_hero)
                 elif e.key == pygame.K_LEFT or e.key == pygame.K_KP4:
-                    pass
+                    print(players_hero[id_hero].chr, map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero])
+                    chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
+                    if chr_go == '-':
+                        map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1], \
+                        map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
+                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
+                        players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero,
+                                                              players_hero[id_hero].x_hero - 1)
+
                 elif e.key == pygame.K_RIGHT or e.key == pygame.K_KP6:
-                    pass
+
+                    chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1]
+                    if chr_go == '-':
+                        map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1], \
+                        map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
+                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1]
+                        players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero,
+                                                              players_hero[id_hero].x_hero + 1)
 
             for button in buttons:
                 button.handle_event(e)
@@ -313,7 +333,7 @@ def game_world_draw(*args):
                 if e.button == buttons[0]:
                     print('0')
                 elif e.button == buttons[1]:
-                    print('1')
+                    flag_player = not flag_player
                 elif e.button == buttons[2]:
                     switch_scene(basic_menu_draw)
                     running = False
@@ -339,7 +359,7 @@ def game_world_draw(*args):
         window.blit(pygame.transform.scale(screen, size), (0, 0))
         screen.blit(pygame.transform.scale(window, size), (0, 0))
         pygame.display.update()
-        clock.tick(408)
+        clock.tick(480)
 
         frame += 1
         if frame % 4 == 0:
