@@ -2,6 +2,7 @@ from menu_start import BasicMenu
 from func_load_image import load_image
 from buton import ImageButton
 from shablon import Hero, AnimatedSprite
+from fog_war import create_fog_war, change_fog_war
 import pygame  # импорт библиотеки PyGame
 
 pygame.init()  # инициализируем PyGame
@@ -168,8 +169,8 @@ def game_world_draw(*args):
     map = [i.rstrip() + '#' * (chunk_size - len(map[0][:-3]) % chunk_size) for i in r]
     map = map + ['#' * len(map[0])] * (chunk_size - len(map) % chunk_size)
     map = [list(i) for i in map]
-    one_player_fog_war = [[False for __ in _] for _ in map]
-    two_player_fog_war = [[False for __ in _] for _ in map]
+    one_player_fog_war = create_fog_war(map, 'A')
+    two_player_fog_war = create_fog_war(map, 'B')
 
     world_size_chunk_x = len(map[0]) // chunk_size
     world_size_chunk_y = len(map) // chunk_size
@@ -201,6 +202,9 @@ def game_world_draw(*args):
         return result
 
     class Chunk:
+        fog_tiel = pygame.transform.scale(
+            load_image('900144_3876.jpg'),
+            (tile_size, tile_size))
         trava = pygame.transform.scale(
             load_image('1626746394_9-kartinkin-com-p-pikselnaya-tekstura-travi-krasivo-11.jpg'),
             (tile_size, tile_size))
@@ -209,12 +213,14 @@ def game_world_draw(*args):
             self.n_tiel_x, self.n_tiel_y = coord_tiel
             self.x, self.y = x, y
 
-        def render(self):
+        def render(self, fog):
             pas = (False, (0, 0))
             for y in range(chunk_size):
                 for x in range(chunk_size):
-                    screen.blit(Chunk.trava, (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
-                    key = map[self.n_tiel_y + y][self.n_tiel_x + x - 1]
+                    fog_flag = fog[self.n_tiel_y + y][self.n_tiel_x + x - 1]
+                    screen.blit(Chunk.trava if not fog_flag else Chunk.fog_tiel,
+                                (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
+
                     if pas[0]:
                         key = map[self.n_tiel_y + pas[1][0]][self.n_tiel_x + pas[1][1] - 1]
                         texture = pygame.transform.scale(
@@ -224,22 +230,25 @@ def game_world_draw(*args):
                                     (self.x + (pas[1][1] - 1) * tile_size - cam_x,
                                      self.y + (pas[1][0] - 2) * tile_size - cam_y))
                         pas = (False, (0, 0))
-                    elif key in 'AB':
-                        if key == 'A':
-                            texture = pygame.transform.scale(hero1_animated.image, (tile_size, tile_size))
-                            screen.blit(texture, (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
+                        continue
+                    if not fog_flag:
+                        key = map[self.n_tiel_y + y][self.n_tiel_x + x - 1]
+                        if key in 'AB':
+                            if key == 'A':
+                                texture = pygame.transform.scale(hero1_animated.image, (tile_size, tile_size))
+                                screen.blit(texture, (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
+                            else:
+                                texture = pygame.transform.scale(hero2_animated.image, (tile_size, tile_size))
+                                screen.blit(texture, (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
+                        elif key in 'OKIF@$':
+                            pas = (True, (y, x))
+                        elif key == '/':
+                            pass
                         else:
-                            texture = pygame.transform.scale(hero2_animated.image, (tile_size, tile_size))
+                            texture = pygame.transform.scale(
+                                img_objects_map[key],
+                                (tile_size, tile_size))
                             screen.blit(texture, (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
-                    elif key in 'OKIF@$':
-                        pas = (True, (y, x))
-                    elif key == '/':
-                        pass
-                    else:
-                        texture = pygame.transform.scale(
-                            img_objects_map[key],
-                            (tile_size, tile_size))
-                        screen.blit(texture, (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
 
     running = True
     chunks = []
@@ -269,7 +278,9 @@ def game_world_draw(*args):
     players_hero = [Hero('A', 2), Hero('B', 3)]  # !!!!! нужно подключить армию
     players_hero[0].find_hero_coords(map)
     players_hero[1].find_hero_coords(map)
+
     steps_current_hero = players_hero[0 if flag_player else 1].give_hero_steps()
+    current_fog = one_player_fog_war if flag_player else two_player_fog_war
 
     frame = 0
     while running:
@@ -297,9 +308,10 @@ def game_world_draw(*args):
                             map[players_hero[id_hero].y_hero - 1][players_hero[id_hero].x_hero]
                         players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero - 1,
                                                               players_hero[id_hero].x_hero)
+                        current_fog = change_fog_war(map, current_fog, players_hero[id_hero].chr)
                         if not (e.mod == pygame.KMOD_LSHIFT):
                             cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
-                                        zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
+                                            zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
 
                 elif e.key == pygame.K_DOWN or e.key == pygame.K_KP2:
                     chr_go = map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero]
@@ -311,9 +323,10 @@ def game_world_draw(*args):
                             map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero]
                         players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero + 1,
                                                               players_hero[id_hero].x_hero)
+                        current_fog = change_fog_war(map, current_fog, players_hero[id_hero].chr)
                         if not (e.mod == pygame.KMOD_LSHIFT):
                             cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
-                                        zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
+                                            zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
                 elif e.key == pygame.K_LEFT or e.key == pygame.K_KP4:
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
                     if chr_go == '-' and steps_current_hero:
@@ -324,9 +337,10 @@ def game_world_draw(*args):
                             map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
                         players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero,
                                                               players_hero[id_hero].x_hero - 1)
+                        current_fog = change_fog_war(map, current_fog, players_hero[id_hero].chr)
                         if not (e.mod == pygame.KMOD_LSHIFT):
                             cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
-                                        zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
+                                            zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
 
                 elif e.key == pygame.K_RIGHT or e.key == pygame.K_KP6:
 
@@ -339,9 +353,10 @@ def game_world_draw(*args):
                             map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1]
                         players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero,
                                                               players_hero[id_hero].x_hero + 1)
+                        current_fog = change_fog_war(map, current_fog, players_hero[id_hero].chr)
                         if not (e.mod == pygame.KMOD_LSHIFT):
                             cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
-                                        zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
+                                            zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
 
             for button in buttons:
                 button.handle_event(e)
@@ -349,10 +364,17 @@ def game_world_draw(*args):
                 if e.button == buttons[0]:
                     print('0')
                 elif e.button == buttons[1]:
+                    sum_day += 0.5
                     flag_player = not flag_player
                     cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
                                     zip(players_hero[::-1][id_hero].give_hero_coords(), res[::-1]))
                     steps_current_hero = players_hero[::-1][id_hero].give_hero_steps()
+                    if not flag_player:
+                        one_player_fog_war = current_fog[:]
+                        current_fog = two_player_fog_war[:]
+                    else:
+                        two_player_fog_war = current_fog[:]
+                        current_fog = one_player_fog_war[:]
                 elif e.button == buttons[2]:
                     switch_scene(basic_menu_draw)
                     running = False
@@ -370,7 +392,7 @@ def game_world_draw(*args):
             cam_y += 3
 
         for i in chunks_on_screen((cam_x, cam_y), chunk_size, tile_size, res, (world_size_chunk_x, world_size_chunk_y)):
-            chunks[i].render()
+            chunks[i].render(current_fog)
 
         for button in buttons:
             button.check_hover([int(i * (res[n] / size[n])) for n, i in enumerate(pygame.mouse.get_pos())])
