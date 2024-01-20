@@ -13,9 +13,14 @@ HEIGHT = 1080  # высота экрана
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))  # создаем поверхность экрана
 
-current_scene = print
+current_scene = lambda x: 1
 fon_download = 'fon_download.png'
 image = "zamok_gorod_fentezi_174584_1920x1080.jpg"
+
+link_sprites_hero1 = 'hero1_standing.png'
+link_sprites_hero2 = 'hero2_standing.png'
+
+scroll = load_image('pixel-scroll-ribbon-ancient-manuscript-parchment-banner_158677-1477.png', -1)
 
 img_objects_map = {'A': load_image('hero1.png', colorkey=-1),
                    'B': load_image('hero2.png', colorkey=-1),
@@ -148,13 +153,14 @@ def menu_draw(*args):
 
 
 def game_world_draw(*args):
-    ret = args
-    map = ret[0]
+    args = args[0]
+    flag_data = True if len(args) > 1 else False
+    link_map = args[0]
 
     size = [1920, 1080]
     res = [480, 260]
 
-    cam_x, cam_y = 0, 0
+    cam_x, cam_y = (0, 0) if not flag_data else args[1]
     global screen
     screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
     window = pygame.transform.scale(screen, res)
@@ -163,21 +169,18 @@ def game_world_draw(*args):
 
     clock = pygame.time.Clock()
 
-    chunk_size = 8
-    tile_size = 16
+    chunk_size = 8 if not flag_data else args[2]
+    tile_size = 16 if not flag_data else args[3]
 
-    r = open(f'{map}', mode="r").readlines()
-    map = [i.rstrip() + '#' * (chunk_size - len(map[0][:-3]) % chunk_size) for i in r]
+    r = open(f'{link_map}', mode="r").readlines()
+    map = [i.rstrip() + '#' * (chunk_size - len(r[0][:-3]) % chunk_size) for i in r]
     map = map + ['#' * len(map[0])] * (chunk_size - len(map) % chunk_size)
-    map = [list(i) for i in map]
-    one_player_fog_war = create_fog_war(map, 'A')
-    two_player_fog_war = create_fog_war(map, 'B')
+    map = [list(i) for i in map] if not flag_data else args[4]
+    one_player_fog_war = create_fog_war(map, 'A') if not flag_data else args[5]
+    two_player_fog_war = create_fog_war(map, 'B') if not flag_data else args[6]
 
-    world_size_chunk_x = len(map[0]) // chunk_size
-    world_size_chunk_y = len(map) // chunk_size
-
-    link_sprites_hero1 = 'hero1_standing.png'
-    link_sprites_hero2 = 'hero2_standing.png'
+    world_size_chunk_x = len(map[0]) // chunk_size if not flag_data else args[7]
+    world_size_chunk_y = len(map) // chunk_size if not flag_data else args[8]
 
     hero1_animated = AnimatedSprite(load_image(link_sprites_hero1, colorkey=-1), 3, 1, 19, 20)
     hero2_animated = AnimatedSprite(load_image(link_sprites_hero2, colorkey=-1), 3, 1, 19, 20)
@@ -253,17 +256,15 @@ def game_world_draw(*args):
                            sound_path='data/musik/torjestvennyiy-zvuk-fanfar.mp3')
                ]
 
-    sum_day = 0
-    flag_player = True
+    sum_day = 0 if not flag_data else args[9]
+    flag_player = True if not flag_data else args[10]
 
-    players_hero = [Hero('A', 2), Hero('B', 3)]  # !!!!! нужно подключить армию
+    players_hero = [Hero('A', 2), Hero('B', 3)] if not flag_data else args[11]  # !!!!! нужно подключить армию
     players_hero[0].find_hero_coords(map)
     players_hero[1].find_hero_coords(map)
 
-    steps_current_hero = players_hero[0 if flag_player else 1].give_hero_steps()
-    current_fog = one_player_fog_war if flag_player else two_player_fog_war
-
-    scroll = load_image('pixel-scroll-ribbon-ancient-manuscript-parchment-banner_158677-1477.png', -1)
+    steps_current_hero = (players_hero[0 if flag_player else 1].give_hero_steps())  if not flag_data else args[12]
+    current_fog = (one_player_fog_war if flag_player else two_player_fog_war) if not flag_data else args[13]
 
     sps_resources_img = pygame.transform.scale(
         load_image('pile-of-gold-in-pixel-art-style_475147-1963.jpg', -1),
@@ -278,7 +279,7 @@ def game_world_draw(*args):
         'pixel-art-illustration-boots-pixelated-boots-autumn-boots-shoes-icon-pixelated-for-the-pixel-art_1038602-215.jpg',
         -1), (int(res[0] * 0.7) // 10, int(int(res[1] * 0.15) * 0.6)))
 
-    frame = 0
+    frame = 0 if not flag_data else args[14]
     while running:
 
         screen.blit(load_image(fon_download), (0, 0))
@@ -323,6 +324,7 @@ def game_world_draw(*args):
                         if not (e.mod == pygame.KMOD_LSHIFT):
                             cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
                                             zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
+
                 elif e.key == pygame.K_LEFT or e.key == pygame.K_KP4:
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
                     if chr_go == '-' and steps_current_hero:
@@ -358,7 +360,9 @@ def game_world_draw(*args):
                 button.handle_event(e)
             if e.type == pygame.USEREVENT:
                 if e.button == buttons[0]:
-                    print('0')
+                    switch_scene(hero_characteristics)
+                    running = False
+                    return link_map, (cam_x, cam_y), chunk_size, tile_size, map, one_player_fog_war, two_player_fog_war, world_size_chunk_x, world_size_chunk_y, sum_day, flag_player, players_hero, steps_current_hero, current_fog, frame
                 elif e.button == buttons[1]:
                     sum_day += 0.5
                     flag_player = not flag_player
@@ -412,11 +416,44 @@ def game_world_draw(*args):
         if frame % 100 == 0:
             pygame.display.set_caption('FPS: ' + str(round(clock.get_fps())))
             chunks_on_screen((cam_x, cam_y), chunk_size, tile_size, res, (world_size_chunk_x, world_size_chunk_y))
-    return ret
+
+
+def hero_characteristics(*args):
+    global screen
+    size = 1920, 1080
+    screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
+    screen = pygame.display.set_mode(size)
+    surface = pygame.display.get_surface()
+    size = (surface.get_width(), surface.get_height())
+    button = ImageButton(int(size[0] * 0.8), int(size[1] * 0.1), int(size[0] * 0.1), int(size[1] * 0.1), '',
+                           'krest1.png', hover_image_path='krest2.png')
+    running = True
+    screen.blit(load_image(image), (0, 0))
+    while running:
+        for e in pygame.event.get():
+            button.handle_event(e)
+            if e.type == pygame.QUIT:
+                running = False
+                switch_scene(None)
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_ESCAPE:
+                    running = False
+                    switch_scene(None)
+            if e.type == pygame.USEREVENT:
+                if e.button == button:
+                    running = False
+                    switch_scene(game_world_draw)
+                    return args[0]
+        button.check_hover(pygame.mouse.get_pos())
+        screen.blit(load_image(image), (0, 0))
+        button.check_hover(pygame.mouse.get_pos())
+        button.draw(screen)
+        pygame.display.flip()
+
 
 
 switch_scene(game_world_draw)
-data_game = 'data/maps/map_1.txt'
+data_game = 'data/maps/map_1.txt',
 while current_scene is not None:
     data_game = current_scene(data_game)
 pygame.quit()
