@@ -49,6 +49,7 @@ class Hero:
         self.number, self.id = args
         self.level, self.exp = 0, 0
         self.slots_army = [None, None, None, None, None, None]
+        self.visited_buildings = []
         self.aurs_stable_hors = 0
         self.x_hero = 0
         self.y_hero = 0
@@ -61,7 +62,7 @@ class Hero:
         result = cur.execute("""SELECT * FROM heroes WHERE id = ?""", (self.id,)).fetchone()
         self.name = result[1]
         self.chr = 'A' if self.name == 'red_hero' else 'B'
-        self.steps = result[2]
+        self.steps = 1000000000
         self.attack = result[3]
         self.protection = result[4]
         self.inspiration = result[5]
@@ -75,6 +76,12 @@ class Hero:
         self.wood = 10
         self.rock = 5
         self.cristal = 1
+
+    def add_visited_building(self, tile_y, tile_x):
+        self.visited_buildings.append((tile_y, tile_x))
+
+    def give_visited_buildings(self):
+        return self.visited_buildings
 
     def give_exp(self, exp):
         self.exp += exp

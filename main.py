@@ -5,6 +5,7 @@ from shablon import Hero, AnimatedSprite
 from fog_war import create_fog_war, change_fog_war
 from on_screen import chunks_on_screen, resources_on_screen
 import pygame  # импорт библиотеки PyGame
+import random
 
 pygame.init()  # инициализируем PyGame
 
@@ -263,7 +264,7 @@ def game_world_draw(*args):
     players_hero[0].find_hero_coords(map)
     players_hero[1].find_hero_coords(map)
 
-    steps_current_hero = (players_hero[0 if flag_player else 1].give_hero_steps())  if not flag_data else args[12]
+    steps_current_hero = (players_hero[0 if flag_player else 1].give_hero_steps()) if not flag_data else args[12]
     current_fog = (one_player_fog_war if flag_player else two_player_fog_war) if not flag_data else args[13]
 
     sps_resources_img = pygame.transform.scale(
@@ -280,6 +281,42 @@ def game_world_draw(*args):
         -1), (int(res[0] * 0.7) // 10, int(int(res[1] * 0.15) * 0.6)))
 
     frame = 0 if not flag_data else args[14]
+
+    def go_hero(map, steps_current_hero, current_fog, cam_y, cam_x, direction_y, direction_x, chr_to_replace=''):
+        steps_current_hero -= 1
+        if not chr_to_replace:
+            map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x], \
+            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
+                map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x]
+        else:
+            map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x], \
+            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], chr_to_replace
+        players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero + direction_y,
+                                              players_hero[id_hero].x_hero + direction_x)
+        current_fog = change_fog_war(map, current_fog, players_hero[id_hero].chr)
+        if not (e.mod == pygame.KMOD_LSHIFT):
+            cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
+                            zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
+        return map, steps_current_hero, current_fog, cam_y, cam_x
+
+    def visit_the_building(steps_current_hero, direction_y, direction_x, chr, player_hero):
+        steps_current_hero -= 1
+        coords_build = (player_hero.y_hero + direction_y, player_hero.x_hero + direction_x)
+        if coords_build not in player_hero.visited_buildings:
+            player_hero.add_visited_building(*coords_build)
+            if chr == 'O':
+                player_hero.attack += 1
+            elif chr == 'K':
+                player_hero.protection += 1
+            elif chr == 'I':
+                player_hero.inspiration += 1
+            else:
+                player_hero.luck += 1
+        return steps_current_hero, player_hero
+
+
     while running:
 
         screen.blit(load_image(fon_download), (0, 0))
@@ -295,66 +332,124 @@ def game_world_draw(*args):
                 if e.key == pygame.K_ESCAPE:
                     running = False
                     switch_scene(None)
-                elif e.key == pygame.K_UP or e.key == pygame.K_KP8:
+                elif (e.key == pygame.K_UP or e.key == pygame.K_KP8) and steps_current_hero:
+
                     chr_go = map[players_hero[id_hero].y_hero - 1][players_hero[id_hero].x_hero]
-                    if chr_go == '-' and steps_current_hero:
-                        steps_current_hero -= 1
-                        map[players_hero[id_hero].y_hero - 1][players_hero[id_hero].x_hero], \
-                        map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
-                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
-                            map[players_hero[id_hero].y_hero - 1][players_hero[id_hero].x_hero]
-                        players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero - 1,
-                                                              players_hero[id_hero].x_hero)
-                        current_fog = change_fog_war(map, current_fog, players_hero[id_hero].chr)
-                        if not (e.mod == pygame.KMOD_LSHIFT):
-                            cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
-                                            zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
+                    if chr_go == '-':
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, -1, 0)
+                    elif chr_go == 'G':
+                        players_hero[id_hero].gold += random.randrange(1000, 2001, 1000)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, -1, 0,
+                                                                                     chr_to_replace='-')
+                    elif chr_go == 'W':
+                        players_hero[id_hero].wood += random.randrange(1, 4)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, -1, 0,
+                                                                                     chr_to_replace='-')
+                    elif chr_go == 'R':
+                        players_hero[id_hero].rock += random.randrange(1, 4)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, -1, 0,
+                                                                                     chr_to_replace='-')
+                    elif chr_go == 'M':
+                        players_hero[id_hero].cristal += random.randrange(1, 3)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, -1, 0,
+                                                                                     chr_to_replace='-')
+                    elif any(chr_go == i for i in 'OKIF'):
+                        steps_current_hero, players_hero[id_hero] = list(visit_the_building(steps_current_hero, -1, 0,
+                                                                                       chr_go, players_hero[id_hero]))
 
-                elif e.key == pygame.K_DOWN or e.key == pygame.K_KP2:
+                elif (e.key == pygame.K_DOWN or e.key == pygame.K_KP2) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero]
-                    if chr_go == '-' and steps_current_hero:
-                        steps_current_hero -= 1
-                        map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero], \
-                        map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
-                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
-                            map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero]
-                        players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero + 1,
-                                                              players_hero[id_hero].x_hero)
-                        current_fog = change_fog_war(map, current_fog, players_hero[id_hero].chr)
-                        if not (e.mod == pygame.KMOD_LSHIFT):
-                            cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
-                                            zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
+                    if chr_go == '-':
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 1,
+                                                                                     0)
+                    elif chr_go == 'G':
+                        players_hero[id_hero].gold += random.randrange(1000, 2001, 1000)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 1,
+                                                                                     0, chr_to_replace='-')
+                    elif chr_go == 'W':
+                        players_hero[id_hero].wood += random.randrange(1, 4)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 1,
+                                                                                     0, chr_to_replace='-')
+                    elif chr_go == 'R':
+                        players_hero[id_hero].rock += random.randrange(1, 4)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 1,
+                                                                                     0, chr_to_replace='-')
+                    elif chr_go == 'M':
+                        players_hero[id_hero].cristal += random.randrange(1, 3)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 1,
+                                                                                     0, chr_to_replace='-')
+                    elif any(chr_go == i for i in 'OKIF'):
+                        steps_current_hero, players_hero[id_hero] = list(visit_the_building(steps_current_hero, 1, 0,
+                                                                                       chr_go, players_hero[id_hero]))
 
-                elif e.key == pygame.K_LEFT or e.key == pygame.K_KP4:
+                elif (e.key == pygame.K_LEFT or e.key == pygame.K_KP4) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
-                    if chr_go == '-' and steps_current_hero:
-                        steps_current_hero -= 1
-                        map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1], \
-                        map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
-                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
-                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
-                        players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero,
-                                                              players_hero[id_hero].x_hero - 1)
-                        current_fog = change_fog_war(map, current_fog, players_hero[id_hero].chr)
-                        if not (e.mod == pygame.KMOD_LSHIFT):
-                            cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
-                                            zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
-
-                elif e.key == pygame.K_RIGHT or e.key == pygame.K_KP6:
+                    if chr_go == '-':
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 0,
+                                                                                     -1)
+                    elif chr_go == 'G':
+                        players_hero[id_hero].gold += random.randrange(1000, 2001, 1000)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 0,
+                                                                                     -1, chr_to_replace='-')
+                    elif chr_go == 'W':
+                        players_hero[id_hero].wood += random.randrange(1, 4)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 0,
+                                                                                     -1, chr_to_replace='-')
+                    elif chr_go == 'R':
+                        players_hero[id_hero].rock += random.randrange(1, 4)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 0,
+                                                                                     -1, chr_to_replace='-')
+                    elif chr_go == 'C':
+                        players_hero[id_hero].rock += random.randrange(1, 3)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 0,
+                                                                                     -1, chr_to_replace='-')
+                    elif any(chr_go == i for i in 'OKIF'):
+                        steps_current_hero, players_hero[id_hero] = list(visit_the_building(steps_current_hero, 0, -1,
+                                                                                       chr_go, players_hero[id_hero]))
+                elif (e.key == pygame.K_RIGHT or e.key == pygame.K_KP6) and steps_current_hero:
 
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1]
-                    if chr_go == '-' and steps_current_hero:
-                        steps_current_hero -= 1
-                        map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1], \
-                        map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
-                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
-                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1]
-                        players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero,
-                                                              players_hero[id_hero].x_hero + 1)
-                        current_fog = change_fog_war(map, current_fog, players_hero[id_hero].chr)
-                        if not (e.mod == pygame.KMOD_LSHIFT):
-                            cam_y, cam_x = (i * tile_size - ii // 2 for i, ii in
-                                            zip(players_hero[id_hero].give_hero_coords(), res[::-1]))
+                    if chr_go == '-':
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 0, 1)
+                    elif chr_go == 'G':
+                        players_hero[id_hero].gold += random.randrange(1000, 2001, 1000)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 0,
+                                                                                     1, chr_to_replace='-')
+                    elif chr_go == 'W':
+                        players_hero[id_hero].wood += random.randrange(1, 4)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 0,
+                                                                                     1, chr_to_replace='-')
+                    elif chr_go == 'R':
+                        players_hero[id_hero].rock += random.randrange(1, 4)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 0,
+                                                                                     1, chr_to_replace='-')
+                    elif chr_go == 'M':
+                        players_hero[id_hero].cristal += random.randrange(1, 3)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 0,
+                                                                                     1, chr_to_replace='-')
+                    elif any(chr_go == i for i in 'OKIF'):
+                        steps_current_hero, players_hero[id_hero] = list(visit_the_building(steps_current_hero, 0, 1,
+                                                                                       chr_go, players_hero[id_hero]))
 
             for button in buttons:
                 button.handle_event(e)
@@ -362,7 +457,8 @@ def game_world_draw(*args):
                 if e.button == buttons[0]:
                     switch_scene(hero_characteristics)
                     running = False
-                    return link_map, (cam_x, cam_y), chunk_size, tile_size, map, one_player_fog_war, two_player_fog_war, world_size_chunk_x, world_size_chunk_y, sum_day, flag_player, players_hero, steps_current_hero, current_fog, frame
+                    return link_map, (cam_x,
+                                      cam_y), chunk_size, tile_size, map, one_player_fog_war, two_player_fog_war, world_size_chunk_x, world_size_chunk_y, sum_day, flag_player, players_hero, steps_current_hero, current_fog, frame
                 elif e.button == buttons[1]:
                     sum_day += 0.5
                     flag_player = not flag_player
@@ -426,7 +522,7 @@ def hero_characteristics(*args):
     surface = pygame.display.get_surface()
     size = (surface.get_width(), surface.get_height())
     button = ImageButton(int(size[0] * 0.8), int(size[1] * 0.1), int(size[0] * 0.1), int(size[1] * 0.1), '',
-                           'krest1.png', hover_image_path='krest2.png')
+                         'krest1.png', hover_image_path='krest2.png')
     running = True
     screen.blit(load_image(image), (0, 0))
     while running:
@@ -449,7 +545,6 @@ def hero_characteristics(*args):
         button.check_hover(pygame.mouse.get_pos())
         button.draw(screen)
         pygame.display.flip()
-
 
 
 switch_scene(game_world_draw)
