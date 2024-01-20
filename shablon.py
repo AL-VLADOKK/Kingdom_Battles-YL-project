@@ -50,7 +50,6 @@ class Hero:
         self.level, self.exp = 0, 0
         self.slots_army = [None, None, None, None, None, None]
         self.aurs_stable_hors = 0
-        self.construction = []  # сюда будут сохранятся ссылки на обьекты на карте или их кординаты, которые посещаются один раз(кузня, оружейник)
         self.x_hero = 0
         self.y_hero = 0
 
@@ -71,6 +70,11 @@ class Hero:
         self.slot_2 = result[8]
         self.slot_3 = result[9]
         self.slot_4 = result[10]
+
+        self.gold = 1000  # подключить базу
+        self.wood = 10
+        self.rock = 5
+        self.cristal = 1
 
     def give_exp(self, exp):
         self.exp += exp
@@ -109,5 +113,5 @@ class Hero:
     def visited_the_stables(self):
         self.aurs_stable_hors = 7
 
-    link_on_hero_1_animation = ['', '', '', '', '']
-    link_on_hero_2_animation = ['', '', '', '', '']
+    def give_resources(self):
+        return self.gold, self.wood, self.rock, self.cristal

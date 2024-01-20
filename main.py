@@ -3,6 +3,7 @@ from func_load_image import load_image
 from buton import ImageButton
 from shablon import Hero, AnimatedSprite
 from fog_war import create_fog_war, change_fog_war
+from on_screen import chunks_on_screen, resources_on_screen
 import pygame  # импорт библиотеки PyGame
 
 pygame.init()  # инициализируем PyGame
@@ -181,26 +182,6 @@ def game_world_draw(*args):
     hero1_animated = AnimatedSprite(load_image(link_sprites_hero1, colorkey=-1), 3, 1, 19, 20)
     hero2_animated = AnimatedSprite(load_image(link_sprites_hero2, colorkey=-1), 3, 1, 19, 20)
 
-    def chunks_on_screen(cam, chunk_size, tile_size, res, world_size_chunk):
-        x1 = cam[0] // (chunk_size * tile_size)
-        y1 = cam[1] // (chunk_size * tile_size)
-
-        x2 = (cam[0] + res[0]) // (chunk_size * tile_size)
-        y2 = (cam[1] + res[1]) // (chunk_size * tile_size)
-
-        x1 = min(max(x1, 0), world_size_chunk[0] - 1)
-        x2 = min(max(x2, 0), world_size_chunk[0] - 1)
-
-        y1 = min(max(y1, 0), world_size_chunk[1] - 1)
-        y2 = min(max(y2, 0), world_size_chunk[1] - 1)
-
-        result = []
-        for y in range(y1, y2 + 1):
-            for x in range(x1, x2 + 1):
-                result.append(x + y * world_size_chunk[1])
-
-        return result
-
     class Chunk:
         fog_tiel = pygame.transform.scale(
             load_image('900144_3876.jpg'),
@@ -281,6 +262,21 @@ def game_world_draw(*args):
 
     steps_current_hero = players_hero[0 if flag_player else 1].give_hero_steps()
     current_fog = one_player_fog_war if flag_player else two_player_fog_war
+
+    scroll = load_image('pixel-scroll-ribbon-ancient-manuscript-parchment-banner_158677-1477.png', -1)
+
+    sps_resources_img = pygame.transform.scale(
+        load_image('pile-of-gold-in-pixel-art-style_475147-1963.jpg', -1),
+        (int(res[0] * 0.7) // 10, int(int(res[1] * 0.15) * 0.6))), pygame.transform.scale(
+        load_image('n6tp_bfnl_210603.png', -1),
+        (int(res[0] * 0.7) // 10,
+         int(int(res[1] * 0.15) * 0.6))), pygame.transform.scale(
+        load_image('photo1705405793.png', -1),
+        (int(res[0] * 0.7) // 10, int(int(res[1] * 0.15) * 0.6))), pygame.transform.scale(
+        load_image('kristal.png', -1),
+        (int(res[0] * 0.7) // 10, int(int(res[1] * 0.15) * 0.6))), pygame.transform.scale(load_image(
+        'pixel-art-illustration-boots-pixelated-boots-autumn-boots-shoes-icon-pixelated-for-the-pixel-art_1038602-215.jpg',
+        -1), (int(res[0] * 0.7) // 10, int(int(res[1] * 0.15) * 0.6)))
 
     frame = 0
     while running:
@@ -397,6 +393,10 @@ def game_world_draw(*args):
         for button in buttons:
             button.check_hover([int(i * (res[n] / size[n])) for n, i in enumerate(pygame.mouse.get_pos())])
             button.draw(screen)
+        screen = resources_on_screen(screen, players_hero[id_hero].give_resources(), steps_current_hero,
+                                     int(res[0] * 0.03), int(res[1] * 0.03), int(res[0] * 0.7), int(res[1] * 0.15),
+                                     scroll, sps_resources_img)
+
         window.blit(pygame.transform.scale(screen, size), (0, 0))
         screen.blit(pygame.transform.scale(window, size), (0, 0))
         pygame.display.update()
