@@ -62,7 +62,7 @@ class Hero:
         result = cur.execute("""SELECT * FROM heroes WHERE id = ?""", (self.id,)).fetchone()
         self.name = result[1]
         self.chr = 'A' if self.name == 'red_hero' else 'B'
-        self.steps = 1000000000
+        self.steps = result[2]
         self.attack = result[3]
         self.protection = result[4]
         self.inspiration = result[5]
@@ -76,6 +76,45 @@ class Hero:
         self.wood = 10
         self.rock = 5
         self.cristal = 1
+
+    def load_db(self):  # загрузить в базу все характеристики героя
+        pass
+
+    def add_artefats(self, chr_artefact):
+        cur = self.con.cursor()
+        result = []  # нужно получить все артефакты и харктеристи которые повышаем и на сколько
+        if chr_artefact == '3':  # молот
+            if not self.slot_2:
+                self.slot_2 = result[3]
+                self.luck += result[3][2]
+        elif chr_artefact == '4':  # скрижаль
+            if not self.slot_3:
+                self.slot_3 = result[4]
+                self.luck += result[4][2]
+        elif chr_artefact == '5':  # клевер
+            if not self.slot_4:
+                self.slot_4 = result[5]
+                self.luck += result[5][2]
+        elif chr_artefact == '1':  # свиток урона
+            if self.slot_1[0] == 'Свиток урона':
+                pass
+            elif self.slot_1[0] == 'Свиток защиты':
+                self.slot_1 = result[0]
+                self.attack += result[0][2]
+                self.protection -= result[1][2]
+            else:
+                self.slot_1 = result[0]
+                self.attack += result[0][2]
+        elif chr_artefact == '2':  # свиток защиты
+            if self.slot_1[0] == 'Свиток урона':
+                self.slot_1 = result[1]
+                self.attack -= result[0][2]
+                self.protection += result[1][2]
+            elif self.slot_1[0] == 'Свиток защиты':
+                pass
+            else:
+                self.slot_1 = result[1]
+                self.protection += result[1][2]
 
     def add_visited_building(self, tile_y, tile_x):
         self.visited_buildings.append((tile_y, tile_x))

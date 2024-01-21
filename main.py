@@ -316,6 +316,13 @@ def game_world_draw(*args):
                 player_hero.luck += 1
         return steps_current_hero, player_hero
 
+    def take_the_artifact(map, steps_current_hero, current_fog, cam_y, cam_x, direction_y, direction_x, hero, chr,
+                          chr_to_replace=''):
+        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero, current_fog, cam_y, cam_x,
+                                                                     direction_y, direction_x,
+                                                                     chr_to_replace=chr_to_replace)
+        hero.add_artefats(chr)
+        return map, steps_current_hero, current_fog, cam_y, cam_x, hero
 
     while running:
 
@@ -360,7 +367,13 @@ def game_world_draw(*args):
                                                                                      chr_to_replace='-')
                     elif any(chr_go == i for i in 'OKIF'):
                         steps_current_hero, players_hero[id_hero] = list(visit_the_building(steps_current_hero, -1, 0,
-                                                                                       chr_go, players_hero[id_hero]))
+                                                                                            chr_go,
+                                                                                            players_hero[id_hero]))
+                    elif any(chr_go == i for i in '12345'):
+                        map, steps_current_hero, current_fog, cam_y, cam_x, players_hero[id_hero] = take_the_artifact(
+                            map, steps_current_hero, current_fog, cam_y, cam_x, -1, 0, players_hero[id_hero], chr_go,
+                            chr_to_replace='-')
+
 
                 elif (e.key == pygame.K_DOWN or e.key == pygame.K_KP2) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero]
@@ -390,7 +403,12 @@ def game_world_draw(*args):
                                                                                      0, chr_to_replace='-')
                     elif any(chr_go == i for i in 'OKIF'):
                         steps_current_hero, players_hero[id_hero] = list(visit_the_building(steps_current_hero, 1, 0,
-                                                                                       chr_go, players_hero[id_hero]))
+                                                                                            chr_go,
+                                                                                            players_hero[id_hero]))
+                    elif any(chr_go == i for i in '12345'):
+                        map, steps_current_hero, current_fog, cam_y, cam_x, players_hero[id_hero] = take_the_artifact(
+                            map, steps_current_hero, current_fog, cam_y, cam_x, 1, 0, players_hero[id_hero], chr_go,
+                            chr_to_replace='-')
 
                 elif (e.key == pygame.K_LEFT or e.key == pygame.K_KP4) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
@@ -413,6 +431,11 @@ def game_world_draw(*args):
                         map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
                                                                                      current_fog, cam_y, cam_x, 0,
                                                                                      -1, chr_to_replace='-')
+                    elif chr_go == 'M':
+                        players_hero[id_hero].cristal += random.randrange(1, 3)
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 0,
+                                                                                     -1, chr_to_replace='-')
                     elif chr_go == 'C':
                         players_hero[id_hero].rock += random.randrange(1, 3)
                         map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
@@ -420,7 +443,12 @@ def game_world_draw(*args):
                                                                                      -1, chr_to_replace='-')
                     elif any(chr_go == i for i in 'OKIF'):
                         steps_current_hero, players_hero[id_hero] = list(visit_the_building(steps_current_hero, 0, -1,
-                                                                                       chr_go, players_hero[id_hero]))
+                                                                                            chr_go,
+                                                                                            players_hero[id_hero]))
+                    elif any(chr_go == i for i in '12345'):
+                        map, steps_current_hero, current_fog, cam_y, cam_x, players_hero[id_hero] = take_the_artifact(
+                            map, steps_current_hero, current_fog, cam_y, cam_x, 0, -1, players_hero[id_hero], chr_go,
+                            chr_to_replace='-')
                 elif (e.key == pygame.K_RIGHT or e.key == pygame.K_KP6) and steps_current_hero:
 
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1]
@@ -449,7 +477,12 @@ def game_world_draw(*args):
                                                                                      1, chr_to_replace='-')
                     elif any(chr_go == i for i in 'OKIF'):
                         steps_current_hero, players_hero[id_hero] = list(visit_the_building(steps_current_hero, 0, 1,
-                                                                                       chr_go, players_hero[id_hero]))
+                                                                                            chr_go,
+                                                                                            players_hero[id_hero]))
+                    elif any(chr_go == i for i in '12345'):
+                        map, steps_current_hero, current_fog, cam_y, cam_x, players_hero[id_hero] = take_the_artifact(
+                            map, steps_current_hero, current_fog, cam_y, cam_x, 0, 1, players_hero[id_hero], chr_go,
+                            chr_to_replace='-')
 
             for button in buttons:
                 button.handle_event(e)
@@ -457,8 +490,6 @@ def game_world_draw(*args):
                 if e.button == buttons[0]:
                     switch_scene(hero_characteristics)
                     running = False
-                    return link_map, (cam_x,
-                                      cam_y), chunk_size, tile_size, map, one_player_fog_war, two_player_fog_war, world_size_chunk_x, world_size_chunk_y, sum_day, flag_player, players_hero, steps_current_hero, current_fog, frame
                 elif e.button == buttons[1]:
                     sum_day += 0.5
                     flag_player = not flag_player
@@ -512,6 +543,8 @@ def game_world_draw(*args):
         if frame % 100 == 0:
             pygame.display.set_caption('FPS: ' + str(round(clock.get_fps())))
             chunks_on_screen((cam_x, cam_y), chunk_size, tile_size, res, (world_size_chunk_x, world_size_chunk_y))
+    return link_map, (cam_x,
+                      cam_y), chunk_size, tile_size, map, one_player_fog_war, two_player_fog_war, world_size_chunk_x, world_size_chunk_y, sum_day, flag_player, players_hero, steps_current_hero, current_fog, frame
 
 
 def hero_characteristics(*args):
