@@ -4,6 +4,7 @@ from buton import ImageButton
 from shablon import Hero, AnimatedSprite
 from fog_war import create_fog_war, change_fog_war
 from on_screen import chunks_on_screen, resources_on_screen
+from neutral import create_dict_neutral
 import pygame  # импорт библиотеки PyGame
 import random
 
@@ -172,6 +173,8 @@ def game_world_draw(*args):
 
     chunk_size = 8 if not flag_data else args[2]
     tile_size = 16 if not flag_data else args[3]
+
+    neutral_dict = create_dict_neutral(link_map)
 
     r = open(f'{link_map}', mode="r").readlines()
     map = [i.rstrip() + '#' * (chunk_size - len(r[0][:-3]) % chunk_size) for i in r]
@@ -580,8 +583,10 @@ def hero_characteristics(*args):
         pygame.display.flip()
 
 
+
+
 switch_scene(game_world_draw)
-data_game = 'data/maps/map_1.txt',
+data_game = 'data/maps/map_.txt',
 while current_scene is not None:
     data_game = current_scene(data_game)
 pygame.quit()
