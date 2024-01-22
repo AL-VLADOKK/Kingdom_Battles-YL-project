@@ -46,6 +46,8 @@ img_objects_map = {'A': load_image('hero1.png', colorkey=-1),
                    '5': load_image('70015845_JEMA GER 1640-02.png', colorkey=-1)
                    }
 
+sprites_enemies = {}
+
 
 def switch_scene(scene):
     global current_scene
@@ -176,6 +178,17 @@ def game_world_draw(*args):
 
     neutral_dict = create_dict_neutral(link_map)
 
+    sprites_enemies = {'k': AnimatedSprite(load_image('Peasant.png', colorkey=-1), 3, 1, 19, 20),
+                       'K': AnimatedSprite(load_image('Peasant1.png', colorkey=-1), 3, 1, 19, 20),
+                       's': AnimatedSprite(load_image('Swordmaster.png', colorkey=-1), 3, 1, 19, 20),
+                       'S': AnimatedSprite(load_image('Swordmaster1.png', colorkey=-1), 3, 1, 19, 20),
+                       'a': AnimatedSprite(load_image('Archer.png', colorkey=-1), 3, 1, 19, 20),
+                       'A': AnimatedSprite(load_image('Archer1.png', colorkey=-1), 3, 1, 19, 20),
+                       'c': AnimatedSprite(load_image('Cleric.png', colorkey=-1), 3, 1, 19, 20),
+                       'C': AnimatedSprite(load_image('Cleric1.png', colorkey=-1), 3, 1, 19, 20),
+                       'H': AnimatedSprite(load_image('Cavalier1.png', colorkey=-1), 3, 1, 19, 20),
+                       'M': AnimatedSprite(load_image('Emperor.png', colorkey=-1), 3, 1, 19, 20)}
+
     r = open(f'{link_map}', mode="r").readlines()
     map = [i.rstrip() + '#' * (chunk_size - len(r[0][:-3]) % chunk_size) for i in r]
     map = map + ['#' * len(map[0])] * (chunk_size - len(map) % chunk_size)
@@ -232,6 +245,8 @@ def game_world_draw(*args):
                             pas = (True, (y, x))
                         elif key == '/':
                             pass
+                        elif key == 'V':
+
                         else:
                             texture = pygame.transform.scale(
                                 img_objects_map[key],
@@ -581,8 +596,6 @@ def hero_characteristics(*args):
         button.check_hover(pygame.mouse.get_pos())
         button.draw(screen)
         pygame.display.flip()
-
-
 
 
 switch_scene(game_world_draw)
