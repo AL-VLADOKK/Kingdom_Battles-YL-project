@@ -626,13 +626,6 @@ def hero_characteristics(*args):
         pygame.display.flip()
 
 
-switch_scene(game_world_draw)
-data_game = 'data/maps/map_1.txt',
-while current_scene is not None:
-    data_game = current_scene(data_game)
-pygame.quit()
-
-
 def castle_draw(user_id, can_add_new_building, hero_in_castle=False):
     icon_width = 125
     icon_height = 155
