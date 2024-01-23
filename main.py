@@ -174,20 +174,11 @@ def game_world_draw(*args):
     clock = pygame.time.Clock()
 
     chunk_size = 8 if not flag_data else args[2]
-    tile_size = 16 if not flag_data else args[3]
+    tile_size = 24 if not flag_data else args[3]
 
     neutral_dict = create_dict_neutral(link_map)
 
-    sprites_enemies = {'k': AnimatedSprite(load_image('Peasant.png', colorkey=-1), 3, 1, 19, 20),
-                       'K': AnimatedSprite(load_image('Peasant1.png', colorkey=-1), 3, 1, 19, 20),
-                       's': AnimatedSprite(load_image('Swordmaster.png', colorkey=-1), 3, 1, 19, 20),
-                       'S': AnimatedSprite(load_image('Swordmaster1.png', colorkey=-1), 3, 1, 19, 20),
-                       'a': AnimatedSprite(load_image('Archer.png', colorkey=-1), 3, 1, 19, 20),
-                       'A': AnimatedSprite(load_image('Archer1.png', colorkey=-1), 3, 1, 19, 20),
-                       'c': AnimatedSprite(load_image('Cleric.png', colorkey=-1), 3, 1, 19, 20),
-                       'C': AnimatedSprite(load_image('Cleric1.png', colorkey=-1), 3, 1, 19, 20),
-                       'H': AnimatedSprite(load_image('Cavalier1.png', colorkey=-1), 3, 1, 19, 20),
-                       'M': AnimatedSprite(load_image('Emperor.png', colorkey=-1), 3, 1, 19, 20)}
+    sprites_enemies_i = {'k': 0, 'K': 1, 's': 2, 'S': 3, 'a': 4, 'A': 5, 'c': 6, 'C': 7, 'H': 8, 'M': 9}
 
     r = open(f'{link_map}', mode="r").readlines()
     map = [i.rstrip() + '#' * (chunk_size - len(r[0][:-3]) % chunk_size) for i in r]
@@ -199,8 +190,19 @@ def game_world_draw(*args):
     world_size_chunk_x = len(map[0]) // chunk_size if not flag_data else args[7]
     world_size_chunk_y = len(map) // chunk_size if not flag_data else args[8]
 
-    hero1_animated = AnimatedSprite(load_image(link_sprites_hero1, colorkey=-1), 3, 1, 19, 20)
-    hero2_animated = AnimatedSprite(load_image(link_sprites_hero2, colorkey=-1), 3, 1, 19, 20)
+    hero1_animated = AnimatedSprite(load_image(link_sprites_hero1, colorkey=-1), 3, 1, tile_size, tile_size)
+    hero2_animated = AnimatedSprite(load_image(link_sprites_hero2, colorkey=-1), 3, 1, tile_size, tile_size)
+
+    sprites_enemies = [AnimatedSprite(load_image('Peasant.png'), 4, 1, tile_size, tile_size),
+                       AnimatedSprite(load_image('Peasant1.png', colorkey=-1), 13, 1, tile_size, tile_size),
+                       AnimatedSprite(load_image('Swordmaster.png', colorkey=-1), 3, 1, tile_size, tile_size),
+                       AnimatedSprite(load_image('Swordmaster1.png', colorkey=-1), 3, 1, tile_size, tile_size),
+                       AnimatedSprite(load_image('Archer.png', colorkey=-1), 9, 1, tile_size, tile_size),
+                       AnimatedSprite(load_image('Archer1.png', colorkey=-1), 13, 1, tile_size, tile_size),
+                       AnimatedSprite(load_image('Cleric.png', colorkey=-1), 13, 1, tile_size, tile_size),
+                       AnimatedSprite(load_image('Cleric1.png', colorkey=-1), 13, 1, tile_size, tile_size),
+                       AnimatedSprite(load_image('Cavalier1.png', colorkey=-1), 28, 1, tile_size, tile_size),
+                       AnimatedSprite(load_image('Emperor.png', colorkey=-1), 5, 1, tile_size, tile_size)]
 
     class Chunk:
         fog_tiel = pygame.transform.scale(
@@ -246,7 +248,10 @@ def game_world_draw(*args):
                         elif key == '/':
                             pass
                         elif key == 'V':
-
+                            v = neutral_dict[(self.n_tiel_y + y, self.n_tiel_x + x - 1)]
+                            texture = pygame.transform.scale(sprites_enemies[sprites_enemies_i[v[0][0]]].image,
+                                                             (tile_size, tile_size))
+                            screen.blit(texture, (self.x + x * tile_size - cam_x, self.y + y * tile_size - cam_y))
                         else:
                             texture = pygame.transform.scale(
                                 img_objects_map[key],
@@ -391,6 +396,11 @@ def game_world_draw(*args):
                         map, steps_current_hero, current_fog, cam_y, cam_x, players_hero[id_hero] = take_the_artifact(
                             map, steps_current_hero, current_fog, cam_y, cam_x, -1, 0, players_hero[id_hero], chr_go,
                             chr_to_replace='-')
+                    elif chr_go == 'V':
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, -1, 0,
+                                                                                     chr_to_replace='-')
+
 
 
                 elif (e.key == pygame.K_DOWN or e.key == pygame.K_KP2) and steps_current_hero:
@@ -427,6 +437,10 @@ def game_world_draw(*args):
                         map, steps_current_hero, current_fog, cam_y, cam_x, players_hero[id_hero] = take_the_artifact(
                             map, steps_current_hero, current_fog, cam_y, cam_x, 1, 0, players_hero[id_hero], chr_go,
                             chr_to_replace='-')
+                    elif chr_go == 'V':
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 1, 0,
+                                                                                     chr_to_replace='-')
 
                 elif (e.key == pygame.K_LEFT or e.key == pygame.K_KP4) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
@@ -467,6 +481,10 @@ def game_world_draw(*args):
                         map, steps_current_hero, current_fog, cam_y, cam_x, players_hero[id_hero] = take_the_artifact(
                             map, steps_current_hero, current_fog, cam_y, cam_x, 0, -1, players_hero[id_hero], chr_go,
                             chr_to_replace='-')
+                    elif chr_go == 'V':
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 0, -1,
+                                                                                     chr_to_replace='-')
                 elif (e.key == pygame.K_RIGHT or e.key == pygame.K_KP6) and steps_current_hero:
 
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1]
@@ -501,6 +519,10 @@ def game_world_draw(*args):
                         map, steps_current_hero, current_fog, cam_y, cam_x, players_hero[id_hero] = take_the_artifact(
                             map, steps_current_hero, current_fog, cam_y, cam_x, 0, 1, players_hero[id_hero], chr_go,
                             chr_to_replace='-')
+                    elif chr_go == 'V':
+                        map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
+                                                                                     current_fog, cam_y, cam_x, 0, 1,
+                                                                                     chr_to_replace='-')
 
             for button in buttons:
                 button.handle_event(e)
@@ -552,7 +574,10 @@ def game_world_draw(*args):
         clock.tick(480)
 
         frame += 1
+
         if frame % 4 == 0:
+            for i in range(len(sprites_enemies)):
+                sprites_enemies[i].update()
             if flag_player:
                 hero1_animated.update()
             else:
@@ -599,7 +624,7 @@ def hero_characteristics(*args):
 
 
 switch_scene(game_world_draw)
-data_game = 'data/maps/map_.txt',
+data_game = 'data/maps/map_1.txt',
 while current_scene is not None:
     data_game = current_scene(data_game)
 pygame.quit()
