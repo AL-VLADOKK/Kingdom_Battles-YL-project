@@ -1,4 +1,7 @@
 from units_class import Unit
+from buton import ImageButton
+import pygame
+from func_load_image import load_image
 
 
 def create_dict_neutral(link):
@@ -44,5 +47,7 @@ def battle_enemis_scoring(hero_units, additional_h, neutrals):
 def battle_enemi_hero_scoring(hero_units, additional_h, enemi_hero_units, additional_e):
     return battle_scoring(hero_units, additional_h, enemi_hero_units, additional_e=additional_e)
 
-def draw_preparation_window(screen, ):
-    pass
+
+def draw_preparation_window(screen, x, y, width, height, army1, army2, hero1, herro2=False):
+    screen.blit(pygame.transform.scale(load_image('board.png', colorkey=-1), (width, height)), (x, y))
+    

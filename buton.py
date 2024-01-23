@@ -3,7 +3,6 @@ from func_load_image import load_image
 
 
 class ImageButton:
-
     def __init__(self, x, y, width, height, text, image_path, hover_image_path=None, sound_path=None):
         self.x = x
         self.y = y

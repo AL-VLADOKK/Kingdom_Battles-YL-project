@@ -404,8 +404,6 @@ def game_world_draw(*args):
                                                                                      current_fog, cam_y, cam_x, -1, 0,
                                                                                      chr_to_replace='-')
 
-
-
                 elif (e.key == pygame.K_DOWN or e.key == pygame.K_KP2) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero]
                     if chr_go == '-':
