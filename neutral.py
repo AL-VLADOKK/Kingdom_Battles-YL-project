@@ -3,12 +3,13 @@ from units_class import Unit
 
 def create_dict_neutral(link):
     c = link.split('/')
-    c = '/'.join(c[:-1]) + 'neutral' + c[-1].split('.')[0][-1] + '.txt'
+    c = '/'.join(c[:-1]) + '/neutral' + c[-1].split('.')[0][-1] + '.txt'
     neutrals_coords = {}
-    r = open(f'{c}', mode="r").readlines()
+    r = open(f'{c}', mode="rt").readlines()
     for i in r:
         key, arg = i.rstrip().split('-')
         key = tuple(int(i) for i in key.split(':'))
+        print(arg.split(':'))
         arg = tuple([i[0], int(i[1:])] for i in arg.split(':'))
         neutrals_coords[key] = arg
     return neutrals_coords
@@ -43,3 +44,5 @@ def battle_enemis_scoring(hero_units, additional_h, neutrals):
 def battle_enemi_hero_scoring(hero_units, additional_h, enemi_hero_units, additional_e):
     return battle_scoring(hero_units, additional_h, enemi_hero_units, additional_e=additional_e)
 
+def draw_preparation_window(screen, ):
+    pass
