@@ -13,12 +13,20 @@ def load_db():
     original_hero = cur.execute("""SELECT * FROM heroes WHERE id = 1""").fetchall()
     original_resource = cur.execute("""SELECT * FROM user_resources WHERE id = 1""").fetchall()
 
-    unit_name = cur.execute("""SELECT unit_name FROM units""").fetchall()
-    resource_name = cur.execute("""SELECT name FROM resources""").fetchall()
+    unit_name = []
+    resource_name = []
+    for i in range(10):
+        unit = cur.execute("""SELECT unit_name FROM units WHERE id = ?""", (i + 1,)).fetchone()
+        unit_name.append(unit)
+    for i in range(4):
+        resource = cur.execute("""SELECT name FROM resources WHERE id = ?""", (i + 1,)).fetchone()
+        resource_name.append(resource)
     list_l = ['lvl', 'horse_stable', 'marketplace', 'militia', 'pennies', 'swordmans', 'knights', 'archer',
               'crossbowman', 'cleric', 'abbot', 'angel', 'horseman']
 
     for i in range(len(unit_name)):
+        a = original_user_army[0][i + 2]
+        b = unit_name[i][0]
         cur.execute(f"""UPDATE army SET {unit_name[i][0]} = ? WHERE id = 3""",
                     (original_user_army[0][i + 2],))
         cur.execute(f"""UPDATE army SET {unit_name[i][0]} = ? WHERE id = 5""",

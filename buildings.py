@@ -54,15 +54,15 @@ def usage(self, coords, turn):
         elif turn == 'B':
             user = 3
         if resource is not None:
-            user_result = cur.execute("""SELECT ? FROM user_resources 
-                  WHERE id = ?""", (resource, user,)).fetchone()
+            user_result = cur.execute(f"""SELECT {resource} FROM user_resources 
+                  WHERE id = ?""", (user,)).fetchone()
             new_resource_value = int(user_result[0]) + int(resource_value)
             cur.execute(f"""UPDATE user_resources SET {resource} = ? WHERE id = ?""",
                         (new_resource_value, user,))
         if trait is not None:
             trait = cur.execute("""SELECT name FROM traits 
                   WHERE id = ?""", (trait,)).fetchone()
-            trait_result = cur.execute("""SELECT ? FROM traits 
+            trait_result = cur.execute(f"""SELECT {trait} FROM traits 
                   WHERE id = ?""", (trait, user,)).fetchone()
             new_trait_value = int(trait_result[0]) + int(trait_value)
             cur.execute(f"""UPDATE traits SET {trait} = ? WHERE id = ?""",
@@ -115,6 +115,7 @@ class RedCastle:
                             (self.building[0] + 1,))
             self.con.commit()
             cur.close()
+            self.load_data()
 
     def new_building(self, building):
         if self.building[building] == 'no':
@@ -136,6 +137,7 @@ class RedCastle:
                 cur.execute(f"""UPDATE castles SET {building} = yes WHERE id = 2""")
             self.con.commit()
             cur.close()
+            self.load_data()
 
     def add_buying_army(self):
         cur = self.con.cursor()
@@ -150,6 +152,7 @@ class RedCastle:
                             (self.buying_army[unit_name[0]],))
         self.con.commit()
         cur.close()
+        self.load_data()
 
     def buy_army(self, unit):
         if self.buying_army[unit] > 0:
@@ -159,7 +162,7 @@ class RedCastle:
                                 (unit,)).fetchone()
             if gold[0] >= price[0]:
                 self.buying_army[unit] -= 1
-                castle_army = cur.execute("""SELECT ? FROM army WHERE id = 4""", (unit,)).fetchone()
+                castle_army = cur.execute(f"""SELECT {unit} FROM army WHERE id = 4""").fetchone()
                 cur.execute(f"""UPDATE army SET {unit} = ? WHERE id = 7""",
                             (self.buying_army[unit],))
                 cur.execute(f"""UPDATE army SET {unit} = ? WHERE id = 4""",
@@ -168,18 +171,20 @@ class RedCastle:
                             (gold[0] - price[0],))
             self.con.commit()
             cur.close()
+            self.load_data()
 
     def add_army_to_hero(self, unit):
         cur = self.con.cursor()
-        castle_army = cur.execute("""SELECT ? FROM army WHERE id = 4""", (unit,)).fetchone()
+        castle_army = cur.execute(f"""SELECT {unit} FROM army WHERE id = 4""").fetchone()
         if castle_army[0] > 0:
-            user_army = cur.execute("""SELECT ? FROM army WHERE id = 3""", (unit,)).fetchone()
+            user_army = cur.execute(f"""SELECT {unit} FROM army WHERE id = 3""").fetchone()
             cur.execute(f"""UPDATE army SET {unit} = ? WHERE id = 3""",
                         (user_army[0] + 1,))
             cur.execute(f"""UPDATE army SET {unit} = ? WHERE id = 4""",
                         (castle_army[0] - 1,))
         self.con.commit()
         cur.close()
+        self.load_data()
 
     def add_gold(self):
         if self.building['marketplace'] == 'yes':
@@ -213,7 +218,7 @@ class BlueCastle:
                                       (i + 1,)).fetchone()
             self.buying_army[buying_army[0]] = 0
 
-    def update_castle(self, building):
+    def update_castle(self):
         if self.building[0] <= 2:
             cur = self.con.cursor()
             price = cur.execute("""SELECT gold, wood, rock, magic_cristalls FROM castle_units WHERE id = ?""",
@@ -234,6 +239,7 @@ class BlueCastle:
                             (self.building[0] + 1,))
             self.con.commit()
             cur.close()
+            self.load_data()
 
     def new_building(self, building):
         if self.building[building] == 'no':
@@ -255,6 +261,7 @@ class BlueCastle:
                 cur.execute(f"""UPDATE castles SET {building} = yes WHERE id = 3""")
             self.con.commit()
             cur.close()
+            self.load_data()
 
     def add_buying_army(self):
         cur = self.con.cursor()
@@ -269,6 +276,7 @@ class BlueCastle:
                             (self.buying_army[unit_name[0]],))
         self.con.commit()
         cur.close()
+        self.load_data()
 
     def buy_army(self, unit):
         if self.buying_army[unit] > 0:
@@ -278,7 +286,7 @@ class BlueCastle:
                                 (unit,)).fetchone()
             if gold[0] >= price[0]:
                 self.buying_army[unit] -= 1
-                castle_army = cur.execute("""SELECT ? FROM army WHERE id = 6""", (unit,)).fetchone()
+                castle_army = cur.execute(f"""SELECT {unit} FROM army WHERE id = 6""").fetchone()
                 cur.execute(f"""UPDATE army SET {unit} = ? WHERE id = 8""",
                             (self.buying_army[unit],))
                 cur.execute(f"""UPDATE army SET {unit} = ? WHERE id = 6""",
@@ -287,18 +295,20 @@ class BlueCastle:
                             (gold[0] - price[0],))
             self.con.commit()
             cur.close()
+            self.load_data()
 
     def add_army_to_hero(self, unit):
         cur = self.con.cursor()
-        castle_army = cur.execute("""SELECT ? FROM army WHERE id = 6""", (unit,)).fetchone()
+        castle_army = cur.execute(f"""SELECT {unit} FROM army WHERE id = 6""").fetchone()
         if castle_army[0] > 0:
-            user_army = cur.execute("""SELECT ? FROM army WHERE id = 5""", (unit,)).fetchone()
+            user_army = cur.execute(f"""SELECT {unit} FROM army WHERE id = 5""").fetchone()
             cur.execute(f"""UPDATE army SET {unit} = ? WHERE id = 5""",
                         (user_army[0] + 1,))
             cur.execute(f"""UPDATE army SET {unit} = ? WHERE id = 6""",
                         (castle_army[0] - 1,))
         self.con.commit()
         cur.close()
+        self.load_data()
 
     def add_gold(self):
         if self.building['marketplace'] == 'yes':
