@@ -49,8 +49,8 @@ class Hero:
         self.number, self.id = args
         self.level, self.exp = 0, 0
         self.slots_army = [None, None, None, None, None, None]
+        self.visited_buildings = []
         self.aurs_stable_hors = 0
-        self.construction = []  # сюда будут сохранятся ссылки на обьекты на карте или их кординаты, которые посещаются один раз(кузня, оружейник)
         self.x_hero = 0
         self.y_hero = 0
 
@@ -71,6 +71,56 @@ class Hero:
         self.slot_2 = result[8]
         self.slot_3 = result[9]
         self.slot_4 = result[10]
+
+        self.gold = 1000  # подключить базу
+        self.wood = 10
+        self.rock = 5
+        self.cristal = 1
+
+    def load_db(self):  # загрузить в базу все характеристики героя
+        pass
+
+    def add_artefats(self, chr_artefact):
+        cur = self.con.cursor()
+        result = []  # нужно получить все артефакты и харктеристи которые повышаем и на сколько
+        if chr_artefact == '3':  # молот
+            if not self.slot_2:
+                self.slot_2 = result[3]
+                self.luck += result[3][2]
+        elif chr_artefact == '4':  # скрижаль
+            if not self.slot_3:
+                self.slot_3 = result[4]
+                self.luck += result[4][2]
+        elif chr_artefact == '5':  # клевер
+            if not self.slot_4:
+                self.slot_4 = result[5]
+                self.luck += result[5][2]
+        elif chr_artefact == '1':  # свиток урона
+            if self.slot_1[0] == 'Свиток урона':
+                pass
+            elif self.slot_1[0] == 'Свиток защиты':
+                self.slot_1 = result[0]
+                self.attack += result[0][2]
+                self.protection -= result[1][2]
+            else:
+                self.slot_1 = result[0]
+                self.attack += result[0][2]
+        elif chr_artefact == '2':  # свиток защиты
+            if self.slot_1[0] == 'Свиток урона':
+                self.slot_1 = result[1]
+                self.attack -= result[0][2]
+                self.protection += result[1][2]
+            elif self.slot_1[0] == 'Свиток защиты':
+                pass
+            else:
+                self.slot_1 = result[1]
+                self.protection += result[1][2]
+
+    def add_visited_building(self, tile_y, tile_x):
+        self.visited_buildings.append((tile_y, tile_x))
+
+    def give_visited_buildings(self):
+        return self.visited_buildings
 
     def give_exp(self, exp):
         self.exp += exp
@@ -109,5 +159,5 @@ class Hero:
     def visited_the_stables(self):
         self.aurs_stable_hors = 7
 
-    link_on_hero_1_animation = ['', '', '', '', '']
-    link_on_hero_2_animation = ['', '', '', '', '']
+    def give_resources(self):
+        return self.gold, self.wood, self.rock, self.cristal
