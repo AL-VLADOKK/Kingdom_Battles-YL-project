@@ -1,5 +1,4 @@
 from units_class import Unit
-from buton import ImageButton
 import pygame
 from func_load_image import load_image
 
@@ -47,7 +46,7 @@ def battle_enemi_hero_scoring(hero_units, additional_h, enemi_hero_units, additi
     return battle_scoring(hero_units, additional_h, enemi_hero_units, additional_e=additional_e)
 
 
-def draw_preparation_window(screen, x, y, width, height, army1, army2):
+def draw_preparation_window(army1, army2):
     d = {'peasant': load_image('krestianin_ikonka.png'),
          'penny': load_image('kopeishik_ikonka.png'),
          'swordman': load_image('mechnik_ikonka.png'),
@@ -72,7 +71,7 @@ def draw_preparation_window(screen, x, y, width, height, army1, army2):
     for y, i in zip(range(15, 26, 10), range(1, 3)):
         for x, ii in zip(range(15, 46, 15), range(1, 4)):
             board_img.blit(
-                pygame.transform.scale(load_image('12620557_4Z_2101.w017.n001.350A.p30.350.png', colorkey=-1),
+                pygame.transform.scale(m_arm,
                                        (int(rect[0] * 0.1), int(rect[1] * 0.1))),
                 (int(rect[0] * x // 100), int(rect[1] * y // 100)))
             board_img.blit(
@@ -80,10 +79,10 @@ def draw_preparation_window(screen, x, y, width, height, army1, army2):
                 (int(rect[0] * x // 100 * 1.2), int(rect[1] * y // 100 * 0.15)))
             font = pygame.font.Font(None, int(rect[0] * 0.1 * 0.1))
             text_surface = font.render(str(army1[i * ii][1]), True, (255, 255, 255))
-            screen.blit(text_surface, (int(rect[0] * x * 1.1 // 100), int(rect[1] * y * 1.1 // 100)))
+            board_img.blit(text_surface, (int(rect[0] * x * 1.1 // 100), int(rect[1] * y * 1.1 // 100)))
         for x, ii in zip(range(55, 101, 15), range(1, 4)):
             board_img.blit(
-                pygame.transform.scale(load_image('12620557_4Z_2101.w017.n001.350A.p30.350.png', colorkey=-1),
+                pygame.transform.scale(m_arm,
                                        (int(rect[0] * 0.1), int(rect[1] * 0.1))),
                 (int(rect[0] * x // 100), int(rect[1] * y // 100)))
             board_img.blit(
@@ -91,6 +90,5 @@ def draw_preparation_window(screen, x, y, width, height, army1, army2):
                 (int(rect[0] * x // 100 * 1.2), int(rect[1] * y // 100 * 0.15)))
             font = pygame.font.Font(None, int(rect[0] * 0.1 * 0.1))
             text_surface = font.render(str(army2[i * ii][1]), True, (255, 255, 255))
-            screen.blit(text_surface, (int(rect[0] * x * 1.1 // 100), int(rect[1] * y * 1.1 // 100)))
-
-    screen.blit(pygame.transform.scale(board_img, (width, height)), (x, y))
+            board_img.blit(text_surface, (int(rect[0] * x * 1.1 // 100), int(rect[1] * y * 1.1 // 100)))
+    return board_img
