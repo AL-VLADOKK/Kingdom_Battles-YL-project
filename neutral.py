@@ -33,7 +33,7 @@ def battle_scoring(hero_units, additional_h, neutrals, additional_e=(0, 0, 0, 0)
                 survivors.append([i[0], -1 * int(-(
                         (i[1] * i[0].health_points - i[1].point_to_health(*additional_h, casualties)) / i[
                     0].health_points))])
-        return True, survivors
+        return True, survivors, 0
     else:
         return False,
 
@@ -42,7 +42,7 @@ def battle_enemis_scoring(hero_units, additional_h, neutrals):
     return battle_scoring(hero_units, additional_h, neutral_in_arms(neutrals))
 
 
-def battle_enemi_hero_scoring(hero_units, additional_h, enemi_hero_units, additional_e):
+def battle_enemis_hero_scoring(hero_units, additional_h, enemi_hero_units, additional_e):
     return battle_scoring(hero_units, additional_h, enemi_hero_units, additional_e=additional_e)
 
 

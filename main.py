@@ -4,7 +4,8 @@ from buton import ImageButton
 from shablon import Hero, AnimatedSprite
 from fog_war import create_fog_war, change_fog_war
 from on_screen import chunks_on_screen, resources_on_screen
-from neutral import create_dict_neutral, draw_preparation_window, neutral_in_arms
+from neutral import create_dict_neutral, draw_preparation_window, neutral_in_arms, battle_enemis_scoring, \
+    battle_enemis_hero_scoring
 from buildings import Buildings, RedCastle, BlueCastle
 import pygame  # импорт библиотеки PyGame
 import random
@@ -312,7 +313,9 @@ def game_world_draw(*args):
         'pixel-art-illustration-boots-pixelated-boots-autumn-boots-shoes-icon-pixelated-for-the-pixel-art_1038602-215.jpg',
         -1), (int(res[0] * 0.7) // 10, int(int(res[1] * 0.15) * 0.6)))
 
-    preparation_window = 0, load_image('sheaf_spears.jpg')
+    preparation_window = 0, load_image('sheaf_spears.jpg'), (0, 0)
+
+    winner = ''
 
     frame = 0 if not flag_data else args[14]
 
@@ -408,11 +411,12 @@ def game_world_draw(*args):
                             map, steps_current_hero, current_fog, cam_y, cam_x, -1, 0, players_hero[id_hero], chr_go,
                             chr_to_replace='-')
                     elif chr_go == 'V':
-                        preparation_window = True, draw_preparation_window(players_hero[id_hero].slots_army,
-                                                                           neutral_in_arms(neutral_dict[(
-                                                                               players_hero[id_hero].y_hero - 1,
-                                                                               players_hero[id_hero].x_hero)]))
-
+                        preparation_window = 1, draw_preparation_window(players_hero[id_hero].slots_army,
+                                                                        neutral_in_arms(neutral_dict[(
+                                                                            players_hero[id_hero].y_hero - 1,
+                                                                            players_hero[id_hero].x_hero)])), (-1, 0)
+                        preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
+                                                                        players_hero[::-1][id_hero].slots_army), (-1, 0)
                 elif (e.key == pygame.K_DOWN or e.key == pygame.K_KP2) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero]
                     if chr_go == '-':
@@ -451,7 +455,10 @@ def game_world_draw(*args):
                         preparation_window = True, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                            neutral_in_arms(neutral_dict[(
                                                                                players_hero[id_hero].y_hero + 1,
-                                                                               players_hero[id_hero].x_hero)]))
+                                                                               players_hero[id_hero].x_hero)])), (1, 0)
+                    elif any(chr_go == i for i in 'AB'):
+                        preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
+                                                                        players_hero[::-1][id_hero].slots_army), (1, 0)
                 elif (e.key == pygame.K_LEFT or e.key == pygame.K_KP4) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
                     if chr_go == '-':
@@ -495,7 +502,11 @@ def game_world_draw(*args):
                         preparation_window = True, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                            neutral_in_arms(neutral_dict[(
                                                                                players_hero[id_hero].y_hero,
-                                                                               players_hero[id_hero].x_hero - 1)]))
+                                                                               players_hero[id_hero].x_hero - 1)])), (
+                                                 0, -1)
+                    elif any(chr_go == i for i in 'AB'):
+                        preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
+                                                                        players_hero[::-1][id_hero].slots_army), (0, -1)
                 elif (e.key == pygame.K_RIGHT or e.key == pygame.K_KP6) and steps_current_hero:
 
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1]
@@ -534,7 +545,10 @@ def game_world_draw(*args):
                         preparation_window = 1, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         neutral_in_arms(neutral_dict[(
                                                                             players_hero[id_hero].y_hero,
-                                                                            players_hero[id_hero].x_hero + 1)]))
+                                                                            players_hero[id_hero].x_hero + 1)])), (0, 1)
+                    elif any(chr_go == i for i in 'AB'):
+                        preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
+                                                                        players_hero[::-1][id_hero].slots_army), (0, 1)
 
             if not preparation_window[0]:
                 for button in buttons:
@@ -564,9 +578,42 @@ def game_world_draw(*args):
                 elif e.button == buttons[3] and not preparation_window[0]:
                     print(4)
                 elif e.button == buttons_board[0] and preparation_window[0]:
-                    if
+                    if preparation_window[0] == 1:
+                        result = battle_enemis_scoring(players_hero[id_hero].slots_army, (
+                            players_hero[id_hero].attack, players_hero[id_hero].protection,
+                            players_hero[id_hero].inspiration, players_hero[id_hero].luck), neutral_dict[
+                                                           (players_hero[id_hero].y_hero + preparation_window[2][1],
+                                                            players_hero[id_hero].x_hero + preparation_window[2][0])])
+                        if result[0]:
+                            players_hero[id_hero].give_exp(result[2])
+                            players_hero[id_hero].slots_army(result[1])
+                            map[players_hero[id_hero].y_hero + preparation_window[2][1]][
+                                players_hero[id_hero].x_hero + preparation_window[2][0]], \
+                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = players_hero[
+                                                                                                  id_hero].chr, '-'
+                            preparation_window = 0, load_image('sheaf_spears.jpg'), (0, 0)
+
+                        else:
+                            switch_scene(result_window)
+                            winner = players_hero[::-1][id_hero].chr
+                            running = False
+                    elif preparation_window[0] == 2:
+                        result = battle_enemis_hero_scoring(players_hero[id_hero].slots_army, (
+                            players_hero[id_hero].attack, players_hero[id_hero].protection,
+                            players_hero[id_hero].inspiration, players_hero[id_hero].luck),
+                                                            players_hero[::-1][id_hero].slots_army, additional_e=(
+                                players_hero[::-1][id_hero].attack, players_hero[::-1][id_hero].protection,
+                                players_hero[::-1][id_hero].inspiration, players_hero[::-1][id_hero].luck))
+                        if result[0]:
+                            switch_scene(result_window)
+                            winner = players_hero[id_hero].chr
+                            running = False
+                        else:
+                            switch_scene(result_window)
+                            winner = players_hero[::-1][id_hero].chr
+                            running = False
                 elif e.button == buttons_board[1] and preparation_window[0]:
-                    preparation_window = 0, load_image('sheaf_spears.jpg')
+                    preparation_window = 0, load_image('sheaf_spears.jpg'), (0, 0)
 
         key = pygame.key.get_pressed()
         if key[pygame.K_a]:
@@ -615,10 +662,43 @@ def game_world_draw(*args):
             pygame.display.set_caption('FPS: ' + str(round(clock.get_fps())))
             chunks_on_screen((cam_x, cam_y), chunk_size, tile_size, res, (world_size_chunk_x, world_size_chunk_y))
     return link_map, (cam_x,
-                      cam_y), chunk_size, tile_size, map, one_player_fog_war, two_player_fog_war, world_size_chunk_x, world_size_chunk_y, sum_day, flag_player, players_hero, steps_current_hero, current_fog, frame
+                      cam_y), chunk_size, tile_size, map, one_player_fog_war, two_player_fog_war, world_size_chunk_x, world_size_chunk_y, sum_day, flag_player, players_hero, steps_current_hero, current_fog, frame, winner
 
 
 def hero_characteristics(*args):
+    global screen
+    size = 1920, 1080
+    screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
+    screen = pygame.display.set_mode(size)
+    surface = pygame.display.get_surface()
+    size = (surface.get_width(), surface.get_height())
+    button = ImageButton(int(size[0] * 0.8), int(size[1] * 0.1), int(size[0] * 0.1), int(size[1] * 0.1), '',
+                         'krest1.png', hover_image_path='krest2.png')
+    running = True
+    screen.blit(load_image(image), (0, 0))
+    while running:
+        for e in pygame.event.get():
+            button.handle_event(e)
+            if e.type == pygame.QUIT:
+                running = False
+                switch_scene(None)
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_ESCAPE:
+                    running = False
+                    switch_scene(None)
+            if e.type == pygame.USEREVENT:
+                if e.button == button:
+                    running = False
+                    switch_scene(game_world_draw)
+                    return args[0]
+        button.check_hover(pygame.mouse.get_pos())
+        screen.blit(load_image(image), (0, 0))
+        button.check_hover(pygame.mouse.get_pos())
+        button.draw(screen)
+        pygame.display.flip()
+
+
+def result_window(*args):
     global screen
     size = 1920, 1080
     screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
