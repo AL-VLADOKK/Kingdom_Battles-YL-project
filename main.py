@@ -403,7 +403,6 @@ def game_world_draw(*args):
                         map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
                                                                                      current_fog, cam_y, cam_x, -1, 0,
                                                                                      chr_to_replace='-')
-
                 elif (e.key == pygame.K_DOWN or e.key == pygame.K_KP2) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero]
                     if chr_go == '-':
@@ -442,7 +441,6 @@ def game_world_draw(*args):
                         map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
                                                                                      current_fog, cam_y, cam_x, 1, 0,
                                                                                      chr_to_replace='-')
-
                 elif (e.key == pygame.K_LEFT or e.key == pygame.K_KP4) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
                     if chr_go == '-':
@@ -1086,7 +1084,7 @@ def castle_draw(user_id, can_add_new_building, hero_in_castle=False):
 
 
 switch_scene(game_world_draw)
-data_game = 'data/maps/map_1.txt'
+data_game = 'data/maps/map_1.txt',
 while current_scene is not None:
     data_game = current_scene(data_game)
 pygame.quit()
