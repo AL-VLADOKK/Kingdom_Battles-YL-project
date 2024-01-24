@@ -5,8 +5,11 @@ from shablon import Hero, AnimatedSprite
 from fog_war import create_fog_war, change_fog_war
 from on_screen import chunks_on_screen, resources_on_screen
 from neutral import create_dict_neutral
+from buildings import Buildings, RedCastle, BlueCastle
 import pygame  # импорт библиотеки PyGame
 import random
+import sqlite3
+import os
 
 pygame.init()  # инициализируем PyGame
 
@@ -620,6 +623,467 @@ def hero_characteristics(*args):
         screen.blit(load_image(image), (0, 0))
         button.check_hover(pygame.mouse.get_pos())
         button.draw(screen)
+        pygame.display.flip()
+
+
+def castle_draw(user_id, can_add_new_building, hero_in_castle=False):
+    icon_width = 125
+    icon_height = 155
+    db = "GameDB.db3"
+    db = os.path.join('data/db', db)
+    con = sqlite3.connect(db)
+    list_l = ['lvl', 'horse_stable', 'marketplace', 'militia', 'pennies', 'swordmans', 'knights', 'archer',
+              'crossbowman', 'cleric', 'abbot', 'angel', 'horseman']
+
+    def load_data():
+        if user_id == 2:
+            castle_buying_id = 7
+            castle_army_id = 4
+        elif user_id == 2:
+            castle_buying_id = 8
+            castle_army_id = 6
+        cur = con.cursor()
+        units = cur.execute("""SELECT unit_name FROM units """).fetchall()
+        buying_values = []
+        army_values = []
+        for i in units:
+            unit = i[0]
+            buying = cur.execute(f"""SELECT {unit} FROM army WHERE id = {castle_buying_id}""").fetchone()
+            army = cur.execute(f"""SELECT {unit} FROM army WHERE id = {castle_army_id}""").fetchone()
+            buying_values.append(buying[0])
+            army_values.append(army[0])
+
+        values = [[pygame.font.SysFont('arial', 30).render(f'{buying_values[0]}', True, (255, 255, 255)),
+                   (1343, 180)],
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[1]}', True, (255, 255, 255)),
+                   (1493, 180)],
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[2]}', True, (255, 255, 255)),
+                   (1343, 380)],
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[3]}', True, (255, 255, 255)),
+                   (1493, 380)],
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[4]}', True, (255, 255, 255)),
+                   (1343, 580)],
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[5]}', True, (255, 255, 255)),
+                   (1493, 580)],
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[6]}', True, (255, 255, 255)),
+                   (1343, 780)],
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[7]}', True, (255, 255, 255)),
+                   (1493, 780)],
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[8]}', True, (255, 255, 255)),
+                   (1343, 980)],
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[9]}', True, (255, 255, 255)),
+                   (1493, 980)],
+
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[0]}', True, (255, 255, 255)),
+                   (1688, 180)],
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[1]}', True, (255, 255, 255)),
+                   (1838, 180)],
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[2]}', True, (255, 255, 255)),
+                   (1688, 380)],
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[3]}', True, (255, 255, 255)),
+                   (1838, 380)],
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[4]}', True, (255, 255, 255)),
+                   (1688, 580)],
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[5]}', True, (255, 255, 255)),
+                   (1838, 580)],
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[6]}', True, (255, 255, 255)),
+                   (1688, 780)],
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[7]}', True, (255, 255, 255)),
+                   (1838, 780)],
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[8]}', True, (255, 255, 255)),
+                   (1688, 980)],
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[9]}', True, (255, 255, 255)),
+                   (1838, 980)]
+                  ]
+        return values
+
+    def load_building():
+        cur = con.cursor()
+        building = {}
+        castle = cur.execute("""SELECT lvl, horse_stable, marketplace, militia, pennies, swordmans, knights, 
+        archer, crossbowman, cleric, abbot, angel, horseman FROM castles 
+        WHERE id = ?""", (user_id,)).fetchone()
+        for i in range(len(list_l)):
+            building[list_l[i]] = castle[i]
+        return building
+
+    buttons = [ImageButton(1280, 25, icon_width, icon_height, '', 'krestianin_ikonka.png',
+                           hover_image_path='krestianin_ikonka.png'),
+               ImageButton(1430, 25, icon_width, icon_height, '', 'kopeishik_ikonka.png',
+                           hover_image_path='kopeishik_ikonka.png'),
+               ImageButton(1280, 225, icon_width, icon_height, '', 'mechnik_ikonka.png',
+                           hover_image_path='mechnik_ikonka.png'),
+               ImageButton(1430, 225, icon_width, icon_height, '', 'knight_ikonka.png',
+                           hover_image_path='knight_ikonka.png'),
+               ImageButton(1280, 425, icon_width, icon_height, '', 'luchnick_ikonka.png',
+                           hover_image_path='luchnick_ikonka.png'),
+               ImageButton(1430, 425, icon_width, icon_height, '', 'arbaletchik_ikonka.png',
+                           hover_image_path='arbaletchik_ikonka.png'),
+               ImageButton(1280, 625, icon_width, icon_height, '', 'clerick_ikonka.png',
+                           hover_image_path='clerick_ikonka.png'),
+               ImageButton(1430, 625, icon_width, icon_height, '', 'abbot_ikonka.png',
+                           hover_image_path='abbot_ikonka.png'),
+               ImageButton(1280, 825, icon_width, icon_height, '', 'angel_ikonka.png',
+                           hover_image_path='angel_ikonka.png'),
+               ImageButton(1430, 825, icon_width, icon_height, '', 'vsadnik_ikonka.png',
+                           hover_image_path='vsadnik_ikonka.png'),
+
+               ImageButton(1625, 25, icon_width, icon_height, '', 'krestianin_ikonka.png',
+                           hover_image_path='krestianin_ikonka.png'),
+               ImageButton(1775, 25, icon_width, icon_height, '', 'kopeishik_ikonka.png',
+                           hover_image_path='kopeishik_ikonka.png'),
+               ImageButton(1625, 225, icon_width, icon_height, '', 'mechnik_ikonka.png',
+                           hover_image_path='mechnik_ikonka.png'),
+               ImageButton(1775, 225, icon_width, icon_height, '', 'knight_ikonka.png',
+                           hover_image_path='knight_ikonka.png'),
+               ImageButton(1625, 425, icon_width, icon_height, '', 'luchnick_ikonka.png',
+                           hover_image_path='luchnick_ikonka.png'),
+               ImageButton(1775, 425, icon_width, icon_height, '', 'arbaletchik_ikonka.png',
+                           hover_image_path='arbaletchik_ikonka.png'),
+               ImageButton(1625, 625, icon_width, icon_height, '', 'clerick_ikonka.png',
+                           hover_image_path='clerick_ikonka.png'),
+               ImageButton(1775, 625, icon_width, icon_height, '', 'abbot_ikonka.png',
+                           hover_image_path='abbot_ikonka.png'),
+               ImageButton(1625, 825, icon_width, icon_height, '', 'angel_ikonka.png',
+                           hover_image_path='angel_ikonka.png'),
+               ImageButton(1775, 825, icon_width, icon_height, '', 'vsadnik_ikonka.png',
+                           hover_image_path='vsadnik_ikonka.png'),
+
+               ImageButton(1025, 845, 200, 200, '', 'coin_ikonka.png',
+                           hover_image_path='coin_ikonka.png'),
+
+               ImageButton(220, 210, 200, 200, '', 'sheaf_spears.jpg',
+                           hover_image_path='sheaf_spears.jpg'),
+               ImageButton(220, 420, 200, 200, '', 'knight_buying_ikonka.jpg',
+                           hover_image_path='knight_buying_ikonka.jpg'),
+               ImageButton(530, 210, 200, 200, '', 'coin_ikonka.png',
+                           hover_image_path='coin_ikonka.png'),
+               ImageButton(840, 210, 200, 200, '', 'coin_ikonka.png',
+                           hover_image_path='coin_ikonka.png'),
+               ImageButton(530, 420, 200, 200, '', 'coin_ikonka.png',
+                           hover_image_path='coin_ikonka.png'),
+               ImageButton(840, 420, 200, 200, '', 'coin_ikonka.png',
+                           hover_image_path='coin_ikonka.png'),
+               ImageButton(220, 630, 200, 200, '', 'coin_ikonka.png',
+                           hover_image_path='coin_ikonka.png'),
+               ImageButton(530, 630, 200, 200, '', 'coin_ikonka.png',
+                           hover_image_path='coin_ikonka.png'),
+               ImageButton(840, 630, 200, 200, '', 'coin_ikonka.png',
+                           hover_image_path='coin_ikonka.png'),
+
+               ImageButton(0, 210, 200, 200, '', 'lvl_1_ikonka.png',
+                           hover_image_path='lvl_1_ikonka.png'),
+               ImageButton(0, 420, 200, 200, '', 'lvl_2_ikonka.png',
+                           hover_image_path='lvl_2_ikonka.png'),
+               ImageButton(0, 630, 200, 200, '', 'lvl_3_ikonka.png',
+                           hover_image_path='lvl_3_ikonka.png'),
+
+               ImageButton(0, 0, 200, 100, 'Exit',
+                           '—Pngtree—buttons games button illustration_5544907.png',
+                           hover_image_path='—Pngtree—buttons games button illustration_5544907_2.png')
+               ]
+    text = [[pygame.font.SysFont('arial', 44).render('Армия', True, (255, 255, 255)),
+             (1280, 1025)],
+            [pygame.font.SysFont('arial', 44).render('Покупка армии', True, (255, 255, 255)),
+             (1625, 1025)]]
+    value_text = load_data()
+    building_value = load_building()
+    icon_selected = False
+    chosen_unit = chosen_unit_rus = ''
+    chosen_building = chosen_building_rus = ''
+    running = True
+    while running:
+        screen.blit(load_image(image), (0, 0))
+        pygame.draw.rect(screen, (82, 122, 149), (1260, 0, 660, 1080))
+        pygame.draw.rect(screen, (138, 6, 0), (0, 830, 1260, 270))
+        pygame.draw.rect(screen, (255, 191, 26), (1580, 0, 20, 1080))
+        pygame.draw.rect(screen, (255, 191, 26), (1240, 0, 20, 1080))
+        pygame.draw.rect(screen, (255, 191, 26), (0, 200, 1260, 10))
+        pygame.draw.rect(screen, (255, 191, 26), (0, 410, 1260, 10))
+        pygame.draw.rect(screen, (255, 191, 26), (0, 620, 1260, 10))
+        pygame.draw.rect(screen, (255, 191, 26), (0, 830, 1260, 10))
+        for text_massage in text:
+            screen.blit(text_massage[0], text_massage[1])
+        for value in value_text:
+            screen.blit(value[0], value[1])
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                running = False
+            #   switch_scene(None)
+            for button in buttons:
+                button.handle_event(e)
+            if e.type == pygame.USEREVENT:
+                if e.button == buttons[0] and hero_in_castle:
+                    if user_id == 2:
+                        r = RedCastle()
+                        r.add_army_to_hero('peasant')
+                    elif user_id == 3:
+                        b = BlueCastle()
+                        b.add_army_to_hero('peasant')
+                elif e.button == buttons[1] and hero_in_castle:
+                    if user_id == 2:
+                        r = RedCastle()
+                        r.add_army_to_hero('penny')
+                    elif user_id == 3:
+                        b = BlueCastle()
+                        b.add_army_to_hero('penny')
+                elif e.button == buttons[2] and hero_in_castle:
+                    if user_id == 2:
+                        r = RedCastle()
+                        r.add_army_to_hero('swordman')
+                    elif user_id == 3:
+                        b = BlueCastle()
+                        b.add_army_to_hero('swordman')
+                elif e.button == buttons[3] and hero_in_castle:
+                    if user_id == 2:
+                        r = RedCastle()
+                        r.add_army_to_hero('knight')
+                    elif user_id == 3:
+                        b = BlueCastle()
+                        b.add_army_to_hero('knight')
+                elif e.button == buttons[4] and hero_in_castle:
+                    if user_id == 2:
+                        r = RedCastle()
+                        r.add_army_to_hero('archer')
+                    elif user_id == 3:
+                        b = BlueCastle()
+                        b.add_army_to_hero('archer')
+                elif e.button == buttons[5] and hero_in_castle:
+                    if user_id == 2:
+                        r = RedCastle()
+                        r.add_army_to_hero('crossbowman')
+                    elif user_id == 3:
+                        b = BlueCastle()
+                        b.add_army_to_hero('crossbowman')
+                elif e.button == buttons[6] and hero_in_castle:
+                    if user_id == 2:
+                        r = RedCastle()
+                        r.add_army_to_hero('cleric')
+                    elif user_id == 3:
+                        b = BlueCastle()
+                        b.add_army_to_hero('cleric')
+                elif e.button == buttons[7] and hero_in_castle:
+                    if user_id == 2:
+                        r = RedCastle()
+                        r.add_army_to_hero('abbot')
+                    elif user_id == 3:
+                        b = BlueCastle()
+                        b.add_army_to_hero('abbot')
+                elif e.button == buttons[8] and hero_in_castle:
+                    if user_id == 2:
+                        r = RedCastle()
+                        r.add_army_to_hero('angel')
+                    elif user_id == 3:
+                        b = BlueCastle()
+                        b.add_army_to_hero('angel')
+                elif e.button == buttons[9] and hero_in_castle:
+                    if user_id == 2:
+                        r = RedCastle()
+                        r.add_army_to_hero('horseman')
+                    elif user_id == 3:
+                        b = BlueCastle()
+                        b.add_army_to_hero('horseman')
+
+                elif e.button == buttons[10]:
+                    chosen_unit = 'peasant'
+                    chosen_unit_rus = 'Крестьянин'
+                    chosen_building = chosen_building_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[11]:
+                    chosen_unit = 'penny'
+                    chosen_unit_rus = 'Копейщик'
+                    chosen_building = chosen_building_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[12]:
+                    chosen_unit = 'swordman'
+                    chosen_unit_rus = 'Мечник'
+                    chosen_building = chosen_building_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[13]:
+                    chosen_unit = 'knight'
+                    chosen_unit_rus = 'Рыцарь'
+                    chosen_building = chosen_building_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[14]:
+                    chosen_unit = 'archer'
+                    chosen_unit_rus = 'Лучник'
+                    chosen_building = chosen_building_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[15]:
+                    chosen_unit = 'crossbowman'
+                    chosen_unit_rus = 'Стрелок'
+                    chosen_building = chosen_building_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[16]:
+                    chosen_unit = 'cleric'
+                    chosen_unit_rus = 'Клирик'
+                    chosen_building = chosen_building_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[17]:
+                    chosen_unit = 'abbot'
+                    chosen_unit_rus = 'Аббат'
+                    chosen_building = chosen_building_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[18]:
+                    chosen_unit = 'angel'
+                    chosen_unit_rus = 'Ангел'
+                    chosen_building = chosen_building_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[19]:
+                    chosen_unit = 'horseman'
+                    chosen_unit_rus = 'Всадник'
+                    chosen_building = chosen_building_rus = ''
+                    icon_selected = True
+
+                elif e.button == buttons[20]:
+                    if chosen_unit != '' and chosen_building == '':
+                        if user_id == 2:
+                            r = RedCastle()
+                            r.buy_army(chosen_unit)
+                            load_data()
+                        elif user_id == 3:
+                            b = BlueCastle()
+                            b.buy_army(chosen_unit)
+                            load_data()
+                        can_add_new_building = False
+                    elif chosen_unit == '' and (chosen_building != '' and chosen_building != 'lvl2'
+                                                and chosen_building != 'lvl3') and can_add_new_building:
+                        if user_id == 2:
+                            r = RedCastle()
+                            r.new_building(chosen_building)
+                            load_building()
+                        elif user_id == 3:
+                            b = BlueCastle()
+                            b.new_building(chosen_building)
+                            load_building()
+                        can_add_new_building = False
+                    elif chosen_unit == '' and chosen_building == 'lvl2':
+                        if user_id == 2:
+                            r = RedCastle()
+                            r.update_castle()
+                            load_building()
+                        elif user_id == 3:
+                            b = BlueCastle()
+                            b.update_castle()
+                            load_building()
+                        can_add_new_building = False
+                    elif chosen_unit == '' and chosen_building == 'lvl3':
+                        if user_id == 2:
+                            r = RedCastle()
+                            r.update_castle()
+                            load_building()
+                        elif user_id == 3:
+                            b = BlueCastle()
+                            b.update_castle()
+                            load_building()
+                        can_add_new_building = False
+
+                elif e.button == buttons[21]:
+                    chosen_building = 'pennies'
+                    chosen_building_rus = 'Казармы копейщиков'
+                    chosen_unit = chosen_unit_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[22]:
+                    chosen_building = 'knights'
+                    chosen_building_rus = 'Рыцарский замок'
+                    chosen_unit = chosen_unit_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[23]:
+                    chosen_building = 'marketplace'
+                    chosen_building_rus = 'Рынок'
+                    chosen_unit = chosen_unit_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[24]:
+                    chosen_building = 'crossbowman'
+                    chosen_building_rus = 'Плац стрелков'
+                    chosen_unit = chosen_unit_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[25]:
+                    chosen_building = 'cleric'
+                    chosen_building_rus = 'Молебни'
+                    chosen_unit = chosen_unit_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[26]:
+                    chosen_building = 'horse_stable'
+                    chosen_building_rus = 'Конная разведка'
+                    chosen_unit = chosen_unit_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[27]:
+                    chosen_building = 'abbot'
+                    chosen_building_rus = 'Собор'
+                    chosen_unit = chosen_unit_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[28]:
+                    chosen_building = 'angel'
+                    chosen_building_rus = 'Небесный алтарь'
+                    chosen_unit = chosen_unit_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[29]:
+                    chosen_building = 'horseman'
+                    chosen_building_rus = 'Конные мастера'
+                    chosen_unit = chosen_unit_rus = ''
+                    icon_selected = True
+
+                elif e.button == buttons[30]:
+                    chosen_building = 'lvl1'
+                    chosen_building_rus = 'Уровень замка 1'
+                    chosen_unit = chosen_unit_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[31]:
+                    chosen_building = 'lvl2'
+                    chosen_building_rus = 'Уровень замка 2'
+                    chosen_unit = chosen_unit_rus = ''
+                    icon_selected = True
+                elif e.button == buttons[32]:
+                    chosen_building = 'lvl3'
+                    chosen_building_rus = 'Уровень замка 3'
+                    chosen_unit = chosen_unit_rus = ''
+                    icon_selected = True
+
+                elif e.button == buttons[33]:
+                    switch_scene(game_world_draw)
+                    running = False
+
+        for button in buttons:
+            button.check_hover(pygame.mouse.get_pos())
+            button.draw(screen)
+        if icon_selected:
+            cur = con.cursor()
+            if chosen_unit != '' and chosen_building == '':
+                price = cur.execute("""SELECT price FROM units WHERE unit_name = ?""",
+                                    (chosen_unit,)).fetchone()
+                description = f'{chosen_unit_rus}: стоимость - {price[0]} золота'
+                t = pygame.font.SysFont('arial', 45).render(description, True, (255, 255, 255))
+                screen.blit(t, (20, 850))
+            elif chosen_unit == '' and chosen_building == 'lvl1':
+                description = f'{chosen_building_rus}: здание уже построено'
+                t = pygame.font.SysFont('arial', 35).render(description, True, (255, 255, 255))
+                screen.blit(t, (20, 850))
+            elif chosen_unit == '' and chosen_building != '' and building_value['lvl'] == 1:
+                price = cur.execute("""SELECT gold, wood, rock, magic_cristalls FROM castle_units 
+                                                    WHERE name = ?""", (chosen_building,)).fetchone()
+                description = (f'{chosen_building_rus}: стоимость - {price[0]} золота, {price[1]} дерева, '
+                               f'{price[2]} камня, {price[3]} магических кристаллов')
+                t = pygame.font.SysFont('arial', 35).render(description, True, (255, 255, 255))
+                screen.blit(t, (20, 850))
+            elif chosen_unit == '' and chosen_building != '' and building_value['lvl'] == 2:
+                price = cur.execute("""SELECT gold, wood, rock, magic_cristalls FROM castle_units 
+                                                    WHERE name = ?""", (chosen_building,)).fetchone()
+                description = (f'{chosen_building_rus}: стоимость - {price[0]} золота, {price[1]} дерева, '
+                               f'{price[2]} камня, {price[3]} магических кристаллов')
+                t = pygame.font.SysFont('arial', 35).render(description, True, (255, 255, 255))
+                screen.blit(t, (20, 850))
+            elif chosen_unit == '' and chosen_building != '' and building_value[chosen_building] == 'no':
+                price = cur.execute("""SELECT gold, wood, rock, magic_cristalls FROM castle_units 
+                                    WHERE name = ?""", (chosen_building,)).fetchone()
+                description = (f'{chosen_building_rus}: стоимость - {price[0]} золота, {price[1]} дерева, '
+                               f'{price[2]} камня, {price[3]} магических кристаллов')
+                t = pygame.font.SysFont('arial', 35).render(description, True, (255, 255, 255))
+                screen.blit(t, (20, 850))
+            elif chosen_unit == '' and chosen_building != '' and building_value[chosen_building] == 'yes':
+                description = f'{chosen_building_rus}: здание уже построено'
+                t = pygame.font.SysFont('arial', 35).render(description, True, (255, 255, 255))
+                screen.blit(t, (20, 850))
         pygame.display.flip()
 
 
