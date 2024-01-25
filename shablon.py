@@ -48,7 +48,7 @@ class Hero:
     def __init__(self, *args):
         self.number, self.id = args
         self.level, self.exp = 0, 0
-        self.slots_army = [None, None, None, None, None, None]
+        self.slots_army = [False, False, False, False, False, False]
         self.visited_buildings = []
         self.aurs_stable_hors = 0
         self.x_hero = 0
@@ -62,7 +62,7 @@ class Hero:
         result = cur.execute("""SELECT * FROM heroes WHERE id = ?""", (self.id,)).fetchone()
         self.name = result[1]
         self.chr = 'A' if self.name == 'red_hero' else 'B'
-        self.steps = result[2]
+        self.steps = 999999
         self.attack = result[3]
         self.protection = result[4]
         self.inspiration = result[5]
