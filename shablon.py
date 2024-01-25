@@ -78,23 +78,29 @@ class Hero:
         self.cristal = 1
 
     def load_db(self):  # загрузить в базу все характеристики героя
-        pass
+        cur = self.con.cursor()
+        cur.execute("""UPDATE heroes SET motion = ?, damage = ?, protection = ?, inspiration = ?, luck = ?,
+                slot_a = ?, slot_b = ?, slot_c = ?, slot_d = ? WHERE id = ?""",
+                    (self.steps, self.attack, self.protection, self.inspiration, self.luck, self.slot_1,
+                     self.slot_2, self.slot_3, self.slot_4, self.id))
+        self.con.commit()
+        cur.close()
 
     def add_artefats(self, chr_artefact):
         cur = self.con.cursor()
-        result = []  # нужно получить все артефакты и харктеристи которые повышаем и на сколько
+        result = cur.execute("""SELECT name, trait, value FROM artifacts """, (self.id,)).fetchall()
         if chr_artefact == '3':  # молот
             if not self.slot_2:
-                self.slot_2 = result[3]
-                self.luck += result[3][2]
+                self.slot_2 = result[2]
+                self.luck += result[2][2]
         elif chr_artefact == '4':  # скрижаль
             if not self.slot_3:
-                self.slot_3 = result[4]
-                self.luck += result[4][2]
+                self.slot_3 = result[3]
+                self.luck += result[3][2]
         elif chr_artefact == '5':  # клевер
             if not self.slot_4:
-                self.slot_4 = result[5]
-                self.luck += result[5][2]
+                self.slot_4 = result[4]
+                self.luck += result[4][2]
         elif chr_artefact == '1':  # свиток урона
             if self.slot_1[0] == 'Свиток урона':
                 pass

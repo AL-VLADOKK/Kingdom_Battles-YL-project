@@ -1,3 +1,5 @@
+import pygame, os, sqlite3
+
 class Unit:
     d = {'k': 'peasant',
          'K': 'penny',
@@ -11,13 +13,21 @@ class Unit:
          'M': 'master of light and might'}
 
     def __init__(self, chr):
-        self.name = str(Unit.d[chr])  # нужно подключить бд
-        self.initiative = 1
-        self.health_points = 1
-        self.damage = 1
-        self.protection = 1
-        self.inspiration = 0
-        self.luck = 0
+        db = "GameDB.db3"
+        db = os.path.join('data/db', db)
+        self.con = sqlite3.connect(db)
+
+        self.name = Unit.d[chr]
+        cur = self.con.cursor()
+        result = cur.execute("""SELECT * FROM units WHERE unit_name = ?""", (self.name,)).fetchone()
+
+        self.motion = result[2]
+        self.initiative = result[3]
+        self.health_points = result[4]
+        self.damage = result[5]
+        self.protection = result[6]
+        self.inspiration = result[7]
+        self.luck = result[8]
 
     def scroll(self, damage, protection, inspiration, luck):
         point_one = (self.damage + damage + self.protection + protection) * (
