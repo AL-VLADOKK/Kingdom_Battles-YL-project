@@ -131,7 +131,7 @@ def menu_draw(*args):
     screen = pygame.display.set_mode(size)
     menu = BasicMenu()
     menu.append_option('Играть', lambda: switch_scene(game_world_draw))
-    menu.append_option('Выбрать карту', lambda: quit)
+    menu.append_option('Выбрать карту', lambda: switch_scene(select_map_1()))
     menu.append_option('Вернуться', lambda: switch_scene(basic_menu_draw))
     running = True
     screen.blit(load_image(image), (0, 0))
@@ -157,6 +157,133 @@ def menu_draw(*args):
                     running = False
         screen.blit(load_image(image), (0, 0))
         menu.draw(screen, 800, 400, 75)
+        pygame.display.flip()
+
+
+def select_map_1():
+    size = 1920, 1080
+    global screen
+    global data_game
+    screen = pygame.display.set_mode(size)
+    menu = BasicMenu()
+
+    db = "GameDB.db3"
+    db = os.path.join('data/db', db)
+    con = sqlite3.connect(db)
+    cur = con.cursor()
+    result = cur.execute("""SELECT name, description, link FROM maps WHERE id = 1""").fetchall()
+
+    menu.append_option(f'{result[0][0]}', lambda: switch_scene(select_map_1))
+    menu.append_option('...', lambda: switch_scene(select_map_2))
+    menu.append_option('Вернуться', lambda: switch_scene(menu_draw))
+
+    description_text = result[0][1].split('\\n')
+    selected_map = result[0][2]
+    description_1 = pygame.font.SysFont('arial', 44).render(description_text[0], True, (255, 255, 255))
+    description_2 = pygame.font.SysFont('arial', 44).render(description_text[1], True, (255, 255, 255))
+    running = True
+    screen.blit(load_image(image), (0, 0))
+    menu.draw(screen, 400, 400, 75)
+    buttons = [ImageButton(920, 625, 1000, 350, '', 'scroll.png',
+                           hover_image_path='scroll.png'),
+               ImageButton(375, 800, 300, 200, 'ВЫБРАТЬ',
+                           '—Pngtree—buttons games button illustration_5544907.png',
+                           hover_image_path='—Pngtree—buttons games button illustration_5544907_2.png')
+               ]
+    while running:
+        for e in pygame.event.get():
+            if e.type == pygame.MOUSEBUTTONDOWN:
+                running = False
+                menu.click(e.pos)
+            if e.type == pygame.QUIT:
+                running = False
+                switch_scene(None)
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_ESCAPE:
+                    running = False
+                    switch_scene(None)
+                elif e.key == pygame.K_w:
+                    menu.switch(-1)
+                elif e.key == pygame.K_s:
+                    menu.switch(1)
+                elif e.key == pygame.K_SPACE:
+                    menu.select()
+                    running = False
+            for button in buttons:
+                button.handle_event(e)
+            if e.type == pygame.USEREVENT:
+                if e.button == buttons[1]:
+                    data_game = f'data/maps/{selected_map}'
+        screen.blit(load_image(image), (0, 0))
+        for button in buttons:
+            button.check_hover(pygame.mouse.get_pos())
+            button.draw(screen)
+        screen.blit(description_1, (1100, 700))
+        screen.blit(description_2, (1100, 800))
+        menu.draw(screen, 400, 400, 75)
+        pygame.display.flip()
+
+def select_map_2():
+    size = 1920, 1080
+    global screen
+    global data_game
+
+    db = "GameDB.db3"
+    db = os.path.join('data/db', db)
+    con = sqlite3.connect(db)
+    cur = con.cursor()
+    result = cur.execute("""SELECT name, description, link FROM maps WHERE id = 2""").fetchall()
+
+    screen = pygame.display.set_mode(size)
+    menu = BasicMenu()
+    menu.append_option(f'{result[0][0]}', lambda: switch_scene(select_map_1))
+    menu.append_option(f'{result[0][1]}', lambda: switch_scene(select_map_2))
+    menu.append_option('Вернуться', lambda: switch_scene(menu_draw))
+
+    description_text = result[1][1].split('\\n')
+    selected_map = result[1][2]
+    description_1 = pygame.font.SysFont('arial', 44).render(description_text[0], True, (255, 255, 255))
+    description_2 = pygame.font.SysFont('arial', 44).render(description_text[1], True, (255, 255, 255))
+    running = True
+    screen.blit(load_image(image), (0, 0))
+    menu.draw(screen, 400, 400, 75)
+    buttons = [ImageButton(920, 625, 1000, 350, '', 'scroll.png',
+                           hover_image_path='scroll.png'),
+               ImageButton(375, 800, 300, 200, 'ВЫБРАТЬ',
+                           '—Pngtree—buttons games button illustration_5544907.png',
+                           hover_image_path='—Pngtree—buttons games button illustration_5544907_2.png')
+               ]
+    while running:
+        for e in pygame.event.get():
+            if e.type == pygame.MOUSEBUTTONDOWN:
+                running = False
+                menu.click(e.pos)
+            if e.type == pygame.QUIT:
+                running = False
+                switch_scene(None)
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_ESCAPE:
+                    running = False
+                    switch_scene(None)
+                elif e.key == pygame.K_w:
+                    menu.switch(-1)
+                elif e.key == pygame.K_s:
+                    menu.switch(1)
+                elif e.key == pygame.K_SPACE:
+                    menu.select()
+                    running = False
+            for button in buttons:
+                button.handle_event(e)
+            if e.type == pygame.USEREVENT:
+                if e.button == buttons[1]:
+                    data_game = f'data/maps/{selected_map}'
+        screen.blit(load_image(image), (0, 0))
+        for button in buttons:
+            button.check_hover(pygame.mouse.get_pos())
+            button.draw(screen)
+        screen.blit(description_1, (1100, 700))
+        screen.blit(description_2, (1100, 800))
+        menu.draw(screen, 400, 400, 75)
         pygame.display.flip()
 
 
@@ -323,12 +450,12 @@ def game_world_draw(*args):
         steps_current_hero -= 1
         if not chr_to_replace:
             map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x], \
-            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
-                map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x]
+                    map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x]
         else:
             map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x], \
-            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], chr_to_replace
         players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero + direction_y,
                                               players_hero[id_hero].x_hero + direction_x)
@@ -503,7 +630,7 @@ def game_world_draw(*args):
                                                                            neutral_in_arms(neutral_dict[(
                                                                                players_hero[id_hero].y_hero,
                                                                                players_hero[id_hero].x_hero - 1)])), (
-                                                 0, -1)
+                            0, -1)
                     elif any(chr_go == i for i in 'AB'):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (0, -1)
@@ -589,8 +716,8 @@ def game_world_draw(*args):
                             players_hero[id_hero].slots_army(result[1])
                             map[players_hero[id_hero].y_hero + preparation_window[2][1]][
                                 players_hero[id_hero].x_hero + preparation_window[2][0]], \
-                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = players_hero[
-                                                                                                  id_hero].chr, '-'
+                                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = players_hero[
+                                id_hero].chr, '-'
                             preparation_window = 0, load_image('sheaf_spears.jpg'), (0, 0)
 
                         else:
@@ -732,6 +859,7 @@ def result_window(*args):
 
 
 def castle_draw(user_id, can_add_new_building, hero_in_castle=False):
+    global screen
     icon_width = 125
     icon_height = 155
     db = "GameDB.db3"
@@ -1192,7 +1320,8 @@ def castle_draw(user_id, can_add_new_building, hero_in_castle=False):
         pygame.display.flip()
 
 
-switch_scene(game_world_draw)
+switch_scene(select_map_1())
+#switch_scene(game_world_draw)
 data_game = 'data/maps/map_1.txt',
 while current_scene is not None:
     data_game = current_scene(data_game)
