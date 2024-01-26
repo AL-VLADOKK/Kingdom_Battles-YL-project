@@ -839,6 +839,7 @@ def result_window(*args):
     size = (surface.get_width(), surface.get_height())
     button = ImageButton(int(size[0] * 0.8), int(size[1] * 0.1), int(size[0] * 0.1), int(size[1] * 0.1), '',
                          'krest1.png', hover_image_path='krest2.png')
+
     running = True
     screen.blit(load_image(image), (0, 0))
     while running:
@@ -864,6 +865,9 @@ def result_window(*args):
 
 
 def castle_draw(user_id, can_add_new_building, hero_in_castle=False):
+    # user_id = 0
+    # can_add_new_building = 0
+    # hero_in_castle = False
     icon_width = 125
     icon_height = 155
     db = "GameDB.db3"
@@ -1324,8 +1328,8 @@ def castle_draw(user_id, can_add_new_building, hero_in_castle=False):
         pygame.display.flip()
 
 
-switch_scene(game_world_draw)
+switch_scene(castle_draw)
 data_game = 'data/maps/map_1.txt',
 while current_scene is not None:
-    data_game = current_scene(data_game)
+    data_game = current_scene(2, True)
 pygame.quit()

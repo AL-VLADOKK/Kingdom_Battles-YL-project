@@ -67,7 +67,7 @@ def draw_preparation_window(army1, army2):
         board_img.blit(pygame.transform.scale(load_image('mesto_avatara.png', colorkey=-1),
                                               (int(rect[2] * 0.2), int(rect[3] * 0.2))),
                        (int(rect[2] * i // 100), int(rect[3] * 0.05)))
-        ava = load_image('photo1705490612.png', colorkey=-1) if i < 10 else load_image('photo1705490612.png', colorkey=-1)
+        ava = load_image('hero_avatar_1.png', colorkey=-1) if i < 10 else load_image('hero_avatar_2.png', colorkey=-1)
         board_img.blit(pygame.transform.scale(ava, (int(rect[2] * 0.15), int(rect[3] * 0.15))),
                        (int(rect[2] * (i + 3) // 100), int(rect[3] * 0.05)))
     m_arm = load_image('12620557_4Z_2101.w017.n001.350A.p30.350.png', colorkey=-1)
