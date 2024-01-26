@@ -704,6 +704,12 @@ def game_world_draw(*args):
                         two_player_fog_war = current_fog[:]
                         current_fog = one_player_fog_war[:]
                     can_add_new_building = True
+                    if flag_player:
+                        a = RedCastle()
+                        a.add_buying_army()
+                    else:
+                        a = BlueCastle()
+                        a.add_buying_army()
                 elif e.button == buttons[2] and not preparation_window[0]:
                     switch_scene(basic_menu_draw)
                     running = False
@@ -1488,7 +1494,7 @@ def castle_draw(user_id, can_add_new_building, hero_in_castle, *args):
 
 
 switch_scene(game_world_draw)
-data_game = 'data/maps/map_1.txt'
+data_game = 'data/maps/map_1.txt',
 while current_scene is not None:
     data_game = current_scene(data_game)
 pygame.quit()
