@@ -289,17 +289,13 @@ def select_map_2():
 
 
 def game_world_draw(*args):
-    print(args)
-    args = args[0]
-    print(args[0])
+    args = args
     flag_data = True if len(args) > 1 else False
     link_map = args[0]
 
     size = [1920, 1080]
     res = [480, 260]
 
-    if flag_data:
-        print(args[1])
     cam_x, cam_y = (0, 0) if not flag_data else args[1]
     global screen
     screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
@@ -819,6 +815,23 @@ def hero_characteristics(*args):
     size = (surface.get_width(), surface.get_height())
     button = ImageButton(int(size[0] * 0.8), int(size[1] * 0.1), int(size[0] * 0.1), int(size[1] * 0.1), '',
                          'krest1.png', hover_image_path='krest2.png')
+    d = {'peasant': load_image('krestianin_ikonka.png'),
+             'penny': load_image('kopeishik_ikonka.png'),
+             'swordman': load_image('mechnik_ikonka.png'),
+             'knight': load_image('knight_ikonka.png'),
+             'archer': load_image('luchnick_ikonka.png'),
+             'crossbowman': load_image('arbaletchik_ikonka.png'),
+             'cleric': load_image('clerick_ikonka.png'),
+             'abbot': load_image('abbot_ikonka.png'),
+             'horseman': load_image('vsadnik_ikonka.png'),
+             'master of light and might': load_image('angel_ikonka.png')}
+    board = load_image('board.png', colorkey=-1)
+    m_arm = load_image('12620557_4Z_2101.w017.n001.350A.p30.350.png', colorkey=-1)
+
+    s = [load_image('sword.png', colorkey=-1),
+         load_image('sheet.png', colorkey=-1),
+         load_image('luck.png', colorkey=-1),
+         load_image('flagg.png', colorkey=-1)]
     running = True
     screen.blit(load_image(image), (0, 0))
     while running:
@@ -840,17 +853,12 @@ def hero_characteristics(*args):
         screen.blit(load_image(image), (0, 0))
         button.check_hover(pygame.mouse.get_pos())
 
-        board = load_image('board.png', colorkey=-1)
+
         screen.blit(
-                pygame.transform.scale(board, (int(size[0] * 0.4), int(size[1] * 0.6))),
+                pygame.transform.scale(board, (int(size[0] * 0.45), int(size[1] * 0.6))),
                 (int(size[0] * 0.27), int(size[1] * 0.25)))
 
-        m_arm = load_image('12620557_4Z_2101.w017.n001.350A.p30.350.png', colorkey=-1)
 
-        s = [load_image('sword.png', colorkey=-1),
-             load_image('sheet.png', colorkey=-1),
-             load_image('luck.png', colorkey=-1),
-             load_image('flagg.png', colorkey=-1)]
         for x, ii, img in zip(range(30, 66, 10), range(1, 5), range(4)):
 
             screen.blit(
@@ -864,16 +872,7 @@ def hero_characteristics(*args):
             screen.blit(text_surface, (int(size[0] * (x + 2) / 100), int(size[1] * (40 + 5) / 100)))
 
         army = list(heroes[flag_player].slots_army)
-        d = {'peasant': load_image('krestianin_ikonka.png'),
-             'penny': load_image('kopeishik_ikonka.png'),
-             'swordman': load_image('mechnik_ikonka.png'),
-             'knight': load_image('knight_ikonka.png'),
-             'archer': load_image('luchnick_ikonka.png'),
-             'crossbowman': load_image('arbaletchik_ikonka.png'),
-             'cleric': load_image('clerick_ikonka.png'),
-             'abbot': load_image('abbot_ikonka.png'),
-             'horseman': load_image('vsadnik_ikonka.png'),
-             'master of light and might': load_image('angel_ikonka.png')}
+
 
         for y, i in zip(range(60, 71, 10), range(1, 3)):
             for x, ii in zip(range(35, 71, 10), range(1, 4)):
@@ -906,6 +905,22 @@ def result_window(*args):
     size = (surface.get_width(), surface.get_height())
     button = ImageButton(int(size[0] * 0.8), int(size[1] * 0.1), int(size[0] * 0.1), int(size[1] * 0.1), '',
                          'krest1.png', hover_image_path='krest2.png')
+    m_arm = load_image('12620557_4Z_2101.w017.n001.350A.p30.350.png', colorkey=-1)
+    s = [load_image('sword.png', colorkey=-1),
+             load_image('sheet.png', colorkey=-1),
+             load_image('luck.png', colorkey=-1),
+             load_image('flagg.png', colorkey=-1)]
+    d = {'peasant': load_image('krestianin_ikonka.png'),
+             'penny': load_image('kopeishik_ikonka.png'),
+             'swordman': load_image('mechnik_ikonka.png'),
+             'knight': load_image('knight_ikonka.png'),
+             'archer': load_image('luchnick_ikonka.png'),
+             'crossbowman': load_image('arbaletchik_ikonka.png'),
+             'cleric': load_image('clerick_ikonka.png'),
+             'abbot': load_image('abbot_ikonka.png'),
+             'horseman': load_image('vsadnik_ikonka.png'),
+             'master of light and might': load_image('angel_ikonka.png')}
+    w = load_image('winner.png', colorkey=-1)
 
     running = True
     screen.blit(load_image(image), (0, 0))
@@ -929,21 +944,17 @@ def result_window(*args):
         screen.blit(load_image(image), (0, 0))
         button.check_hover(pygame.mouse.get_pos())
 
-        m_arm = load_image('12620557_4Z_2101.w017.n001.350A.p30.350.png', colorkey=-1)
+
         if winner == 'A':
             screen.blit(
-                pygame.transform.scale(load_image('winner.png', colorkey=-1),
-                                       (int(size[0] * 0.1), int(size[0] * 0.1))),
+                pygame.transform.scale(w, (int(size[0] * 0.1), int(size[0] * 0.1))),
                 (int(size[0] * 0.2), int(size[1] * 0.1)))
         else:
             screen.blit(
-                pygame.transform.scale(load_image('winner.png', colorkey=-1), (int(size[0] * 0.1), int(size[0] * 0.1))),
+                pygame.transform.scale(w, (int(size[0] * 0.1), int(size[0] * 0.1))),
                 (int(size[0] * 0.7), int(size[1] * 0.1)))
 
-        s = [load_image('sword.png', colorkey=-1),
-             load_image('sheet.png', colorkey=-1),
-             load_image('luck.png', colorkey=-1),
-             load_image('flagg.png', colorkey=-1)]
+
         for i, pr in zip(range(2), (0, 40)):
             for x, ii, img in zip(range(10, 46, 10), range(1, 5), range(4)):
                 screen.blit(
@@ -958,16 +969,7 @@ def result_window(*args):
 
         army1 = list(heroes[0].slots_army)
         army2 = list(heroes[1].slots_army)
-        d = {'peasant': load_image('krestianin_ikonka.png'),
-             'penny': load_image('kopeishik_ikonka.png'),
-             'swordman': load_image('mechnik_ikonka.png'),
-             'knight': load_image('knight_ikonka.png'),
-             'archer': load_image('luchnick_ikonka.png'),
-             'crossbowman': load_image('arbaletchik_ikonka.png'),
-             'cleric': load_image('clerick_ikonka.png'),
-             'abbot': load_image('abbot_ikonka.png'),
-             'horseman': load_image('vsadnik_ikonka.png'),
-             'master of light and might': load_image('angel_ikonka.png')}
+
 
         for y, i in zip(range(70, 81, 10), range(1, 3)):
             for x, ii in zip(range(10, 36, 10), range(1, 4)):
@@ -1465,7 +1467,7 @@ def castle_draw(user_id, can_add_new_building, hero_in_castle=False):
 
 
 switch_scene(game_world_draw)
-data_game = 'data/maps/map_1.txt',
+data_game = 'data/maps/map_1.txt'
 while current_scene is not None:
     data_game = current_scene(data_game)
 pygame.quit()
