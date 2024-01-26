@@ -303,7 +303,7 @@ def game_world_draw(*args):
     surface = pygame.display.get_surface()
     size = [surface.get_width(), surface.get_height()]
 
-    can_add_new_building = True
+    can_add_new_building = True if not flag_data else args[16]
 
     clock = pygame.time.Clock()
 
@@ -703,7 +703,7 @@ def game_world_draw(*args):
                     else:
                         two_player_fog_war = current_fog[:]
                         current_fog = one_player_fog_war[:]
-                    can_add_new_building = True
+                    can_add_new_building = True if not flag_data else args[16]
                     if flag_player:
                         a = RedCastle()
                         a.add_buying_army()
@@ -714,11 +714,7 @@ def game_world_draw(*args):
                     switch_scene(basic_menu_draw)
                     running = False
                 elif e.button == buttons[3] and not preparation_window[0]:
-                    if flag_player:
-                        a = 2
-                    else:
-                        a = 3
-                    switch_scene(castle_draw(a, can_add_new_building, True))
+                    switch_scene(castle_draw)
                     running = False
                 elif e.button == buttons_board[0] and preparation_window[0]:
                     if preparation_window[0] == 1:
@@ -1016,7 +1012,19 @@ def result_window(*args):
         pygame.display.flip()
 
 
-def castle_draw(user_id, can_add_new_building, hero_in_castle, *args):
+def castle_draw(*args):
+    print(args)
+    args = args[0]
+    print(args)
+    flag_player = args[10]
+    print(args)
+    if flag_player:
+        user_id = 2
+    else:
+        user_id = 3
+    args = args[0]
+    can_add_new_building = args[16]
+    hero_in_castle = True
     icon_width = 125
     icon_height = 155
     db = "GameDB.db3"
@@ -1032,6 +1040,7 @@ def castle_draw(user_id, can_add_new_building, hero_in_castle, *args):
         elif user_id == 2:
             castle_buying_id = 8
             castle_army_id = 6
+
         cur = con.cursor()
         units = cur.execute("""SELECT unit_name FROM units """).fetchall()
         buying_values = []
@@ -1491,6 +1500,7 @@ def castle_draw(user_id, can_add_new_building, hero_in_castle, *args):
                 screen.blit(t, (20, 850))
                 screen.blit(t_1, (20, 900))
         pygame.display.flip()
+        return args[0]
 
 
 switch_scene(game_world_draw)

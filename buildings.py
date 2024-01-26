@@ -95,10 +95,10 @@ class RedCastle:
             self.buying_army[buying_army[0]] = 0
 
     def update_castle(self):
-        if self.building[0] <= 2:
+        if self.building['lvl'] <= 2:
             cur = self.con.cursor()
             price = cur.execute("""SELECT gold, wood, rock, magic_cristalls FROM castle_units WHERE id = ?""",
-                                (12 + self.building[0],)).fetchone()
+                                (12 + self.building['lvl'],)).fetchone()
             resources = cur.execute("""SELECT gold, wood, rock, magic_crystal FROM user_resources 
             WHERE id = 2""").fetchone()
             if resources[0] >= price[0] and resources[1] >= price[1] and resources[2] >= price[2] and (
@@ -112,7 +112,7 @@ class RedCastle:
                 cur.execute("""UPDATE user_resources SET magic_crystal = ? WHERE id = 2""",
                             (resources[3] - price[3],))
                 cur.execute("""UPDATE castles SET lvl = ? WHERE id = 2""",
-                            (self.building[0] + 1,))
+                            (self.building['lvl'] + 1,))
             self.con.commit()
             cur.close()
             self.load_data()
