@@ -10,7 +10,7 @@ class Unit:
          'c': 'cleric',
          'C': 'abbot',
          'H': 'horseman',
-         'M': 'master of light and might'}
+         'M': 'master_of_light_and_might'}
 
     def __init__(self, chr):
         db = "GameDB.db3"

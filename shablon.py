@@ -72,10 +72,12 @@ class Hero:
         self.slot_3 = result[9]
         self.slot_4 = result[10]
 
-        self.gold = 1000  # подключить базу
-        self.wood = 10
-        self.rock = 5
-        self.cristal = 1
+        resource_result = cur.execute("""SELECT gold, wood, rock, magic_crystal
+                                      FROM user_resources WHERE id = ?""", (self.id,)).fetchone()
+        self.gold = resource_result[0]
+        self.wood = resource_result[1]
+        self.rock = resource_result[2]
+        self.cristal = resource_result[3]
 
     def load_db(self):  # загрузить в базу все характеристики героя
         cur = self.con.cursor()
