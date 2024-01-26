@@ -712,7 +712,7 @@ def game_world_draw(*args):
                         a = 2
                     else:
                         a = 3
-                    switch_scene(castle_draw(a,can_add_new_building, True))
+                    switch_scene(castle_draw(a, can_add_new_building, True))
                     running = False
                 elif e.button == buttons_board[0] and preparation_window[0]:
                     if preparation_window[0] == 1:
