@@ -1,5 +1,6 @@
 import pygame, os, sqlite3
 import random
+from units_class import Unit
 
 
 class AnimatedSprite(pygame.sprite.Sprite):
@@ -34,7 +35,7 @@ def random_two_nubers(sum, min):
 class Hero:
     coast_lvl_up_exp = [10, 30, 60, 100, 150, 220, 330, 500, 700, 1000]
     sum_give_characteristics = [1, 1, 2, 2, 2, 3, 3, 3, 3, 4]
-    give_characteristics = {0: lambda: random_two_nubers(1, 0) + (0, 0),
+    d_give_characteristics = {0: lambda: random_two_nubers(1, 0) + (0, 0),
                             1: lambda: random_two_nubers(1, 0) + (0, 0),
                             2: lambda: random_two_nubers(1, 0) + (0, 0),
                             3: lambda: random_two_nubers(2, 0) + (0, 0),
@@ -48,7 +49,7 @@ class Hero:
     def __init__(self, *args):
         self.number, self.id = args
         self.level, self.exp = 0, 0
-        self.slots_army = [False, False, False, False, False, False]
+        self.slots_army = []
         self.visited_buildings = []
         self.aurs_stable_hors = 0
         self.x_hero = 0
@@ -72,21 +73,52 @@ class Hero:
         self.slot_3 = result[9]
         self.slot_4 = result[10]
 
-        resource_result = cur.execute("""SELECT gold, wood, rock, magic_crystal
-                                      FROM user_resources WHERE id = ?""", (self.id,)).fetchone()
-        self.gold = resource_result[0]
-        self.wood = resource_result[1]
-        self.rock = resource_result[2]
-        self.cristal = resource_result[3]
+        resurs = cur.execute("""SELECT gold, wood, rock, magic_crystal from user_resources WHERE id = ?""",
+                             (self.id,)).fetchone()
 
-    def load_db(self):  # загрузить в базу все характеристики героя
+        self.gold = resurs[0]
+        self.wood = resurs[1]
+        self.rock = resurs[2]
+        self.cristal = resurs[3]
+
+        id_arm = 3 if self.id == 2 else 5
+        arms = cur.execute("""SELECT peasant, penny, swordman, knight, archer,
+                crossbowman, cleric, abbot, angel, horseman from army WHERE id = ?""", (id_arm,)).fetchone()
+
+        for i in range(len(arms)):
+            if len(self.slots_army) >= 6:
+                pass
+            else:
+                if arms[i] != 0:
+                    self.slots_army.append([Unit(Unit.r_d[Unit.id_in_d[i]]), arms[i]])
+        for i in range(6 - len(self.slots_army)):
+            self.slots_army.append(False)
+
+    def load_db(self):
         cur = self.con.cursor()
         cur.execute("""UPDATE heroes SET motion = ?, damage = ?, protection = ?, inspiration = ?, luck = ?,
                 slot_a = ?, slot_b = ?, slot_c = ?, slot_d = ? WHERE id = ?""",
                     (self.steps, self.attack, self.protection, self.inspiration, self.luck, self.slot_1,
                      self.slot_2, self.slot_3, self.slot_4, self.id))
         self.con.commit()
+        cur.execute("""UPDATE user_resources SET gold = ?, wood = ?, rock = ?, magic_crystal = ? WHERE id = ?""",
+                    (self.gold, self.wood, self.rock, self.cristal, self.id))
+        self.con.commit()
+        arm = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for i in self.slots_army:
+            if type(i) != bool:
+                arm[i[0].d_in_id[i[0].name]] = i[1]
+
+        id_arm = 3 if self.id == 2 else 5
+        cur.execute("""UPDATE army SET peasant = ?, penny = ?, swordman = ?, knight = ?, archer = ?,
+                crossbowman = ?, cleric = ?, abbot = ?, angel = ?, horseman = ? WHERE id = ?""",
+                    (arm[0], arm[1], arm[2], arm[3], arm[4], arm[5],
+                     arm[6], arm[7], arm[8], arm[9], id_arm))
+        self.con.commit()
         cur.close()
+
+    def give_characteristics(self):
+        return [self.attack, self.protection, self.luck, self.inspiration]
 
     def add_artefats(self, chr_artefact):
         cur = self.con.cursor()
@@ -141,7 +173,7 @@ class Hero:
                 self.exp = Hero.coast_lvl_up_exp[9]
 
     def level_up(self):
-        a, p, i, l = Hero.give_characteristics[self.level]
+        a, p, i, l = Hero.d_give_characteristics[self.level]
         self.attack += a
         self.protection += p
         self.inspiration += i
