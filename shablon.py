@@ -35,7 +35,7 @@ def random_two_nubers(sum, min):
 class Hero:
     coast_lvl_up_exp = [10, 30, 60, 100, 150, 220, 330, 500, 700, 1000]
     sum_give_characteristics = [1, 1, 2, 2, 2, 3, 3, 3, 3, 4]
-    give_characteristics = {0: lambda: random_two_nubers(1, 0) + (0, 0),
+    d_give_characteristics = {0: lambda: random_two_nubers(1, 0) + (0, 0),
                             1: lambda: random_two_nubers(1, 0) + (0, 0),
                             2: lambda: random_two_nubers(1, 0) + (0, 0),
                             3: lambda: random_two_nubers(2, 0) + (0, 0),
@@ -83,14 +83,14 @@ class Hero:
 
         id_arm = 3 if self.id == 2 else 5
         arms = cur.execute("""SELECT peasant, penny, swordman, knight, archer,
-                crossbowman, cleric, abbot, angel, horseman from user_resources WHERE id = ?""", (id_arm,)).fetchone()
+                crossbowman, cleric, abbot, angel, horseman from army WHERE id = ?""", (id_arm,)).fetchone()
 
         for i in range(len(arms)):
             if len(self.slots_army) >= 6:
                 pass
             else:
                 if arms[i] != 0:
-                    self.slots_army.append([Unit(Unit.id_in_d[i]), arms[i]])
+                    self.slots_army.append([Unit(Unit.r_d[Unit.id_in_d[i]]), arms[i]])
         for i in range(6 - len(self.slots_army)):
             self.slots_army.append(False)
 
@@ -116,6 +116,9 @@ class Hero:
                      arm[6], arm[7], arm[8], arm[9], id_arm))
         self.con.commit()
         cur.close()
+
+    def give_characteristics(self):
+        return [self.attack, self.protection, self.luck, self.inspiration]
 
     def add_artefats(self, chr_artefact):
         cur = self.con.cursor()
@@ -170,7 +173,7 @@ class Hero:
                 self.exp = Hero.coast_lvl_up_exp[9]
 
     def level_up(self):
-        a, p, i, l = Hero.give_characteristics[self.level]
+        a, p, i, l = Hero.d_give_characteristics[self.level]
         self.attack += a
         self.protection += p
         self.inspiration += i

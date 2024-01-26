@@ -11,8 +11,9 @@ def create_dict_neutral(link):
     for i in r:
         key, arg = i.rstrip().split('-')
         key = tuple(int(i) for i in key.split(':'))
-        arg = tuple([i[0], int(i[1:])] for i in arg.split(':'))
-        arg += tuple(False for _ in range(6 - len(arg)))
+        arg = list([i[0], int(i[1:])] for i in arg.split(':'))
+        for _ in range(6 - len(arg)):
+            arg.append(False)
         neutrals_coords[key] = arg
     return neutrals_coords
 

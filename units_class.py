@@ -12,6 +12,12 @@ class Unit:
          'C': 'abbot',
          'H': 'horseman',
          'M': 'master of light and might'}
+    r_d = {}
+    for k, v in d.items():
+        if k != 'M':
+            r_d[v] = k
+        else:
+            r_d['angel'] = k
 
     d_in_id = {'peasant': 0,
                'penny': 1,
@@ -25,11 +31,11 @@ class Unit:
                'master of light and might': 9}
 
     id_in_d = {}
-    for k, v in d.items():
-        if k != 'M':
+    for k, v in d_in_id.items():
+        if k != 'master of light and might':
             id_in_d[v] = k
         else:
-            id_in_d['angel'] = k
+            id_in_d[v] = 'angel'
 
     def __init__(self, chr):
         db = "GameDB.db3"
