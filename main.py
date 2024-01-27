@@ -303,8 +303,6 @@ def game_world_draw(*args):
     surface = pygame.display.get_surface()
     size = [surface.get_width(), surface.get_height()]
 
-    can_add_new_building = True if not flag_data else args[16]
-
     clock = pygame.time.Clock()
 
     chunk_size = 8 if not flag_data else args[2]
@@ -449,16 +447,18 @@ def game_world_draw(*args):
 
     frame = 0 if not flag_data else args[14]
 
+    can_add_new_building = True if not flag_data else args[16]
+
     def go_hero(map, steps_current_hero, current_fog, cam_y, cam_x, direction_y, direction_x, chr_to_replace=''):
         steps_current_hero -= 1
         if not chr_to_replace:
             map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x], \
-            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
-                map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x]
+                    map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x]
         else:
             map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x], \
-            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], chr_to_replace
         players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero + direction_y,
                                               players_hero[id_hero].x_hero + direction_x)
@@ -634,7 +634,7 @@ def game_world_draw(*args):
                                                                         neutral_in_arms(neutral_dict[(
                                                                             players_hero[id_hero].y_hero,
                                                                             players_hero[id_hero].x_hero - 1)])), (
-                                             0, -1)
+                            0, -1)
                     elif any(chr_go == i for i in 'AB'):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (0, -1)
@@ -728,7 +728,7 @@ def game_world_draw(*args):
                             players_hero[id_hero].slots_army = result[1]
                             map[players_hero[id_hero].y_hero + preparation_window[2][0]][
                                 players_hero[id_hero].x_hero + preparation_window[2][1]], \
-                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], '-'
                             players_hero[id_hero].set_hero_coords(
                                 players_hero[id_hero].y_hero + preparation_window[2][0],
@@ -811,7 +811,10 @@ def game_world_draw(*args):
 
 def hero_characteristics(*args):
     args = args[0]
+    print(args)
     heroes, flag_player = args[11], args[10]
+    print(args[10])
+    print(flag_player)
     if flag_player:
         flag_player = 0
     else:
@@ -1004,16 +1007,14 @@ def result_window(*args):
         pygame.display.flip()
 
 
-def castle_draw(*arg):
-
-    args = list(arg[0])
-    flag_player = args[10]
+def castle_draw(*args):
+    arg = list(args[0])
+    flag_player = arg[10]
     if flag_player:
         user_id = 2
     else:
         user_id = 3
-    args = args[0]
-    can_add_new_building = args[16]
+    can_add_new_building = True
     hero_in_castle = True
     icon_width = 125
     icon_height = 155
@@ -1021,7 +1022,7 @@ def castle_draw(*arg):
     db = os.path.join('data/db', db)
     con = sqlite3.connect(db)
     list_l = ['lvl', 'horse_stable', 'marketplace', 'militia', 'pennies', 'swordmans', 'knights', 'archer',
-              'crossbowman', 'cleric', 'abbot', 'angel', 'horseman']
+              'crossbowman', 'cleric', 'abbot', 'master_of_light_and_might', 'horseman']
 
     def load_data():
         if user_id == 2:
@@ -1090,7 +1091,7 @@ def castle_draw(*arg):
         cur = con.cursor()
         building = {}
         castle = cur.execute("""SELECT lvl, horse_stable, marketplace, militia, pennies, swordmans, knights, 
-        archer, crossbowman, cleric, abbot, angel, horseman FROM castles 
+        archer, crossbowman, cleric, abbot, master_of_light_and_might, horseman FROM castles 
         WHERE id = ?""", (user_id,)).fetchone()
         for i in range(len(list_l)):
             building[list_l[i]] = castle[i]
@@ -1195,6 +1196,9 @@ def castle_draw(*arg):
             screen.blit(text_massage[0], text_massage[1])
         for value in value_text:
             screen.blit(value[0], value[1])
+        for button in buttons:
+            button.check_hover(pygame.mouse.get_pos())
+            button.draw(screen)
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 running = False
@@ -1403,7 +1407,7 @@ def castle_draw(*arg):
                     chosen_unit = chosen_unit_rus = ''
                     icon_selected = True
                 elif e.button == buttons[28]:
-                    chosen_building = 'angel'
+                    chosen_building = 'master_of_light_and_might'
                     chosen_building_rus = 'Небесный алтарь'
                     chosen_unit = chosen_unit_rus = ''
                     icon_selected = True
@@ -1432,11 +1436,8 @@ def castle_draw(*arg):
                 elif e.button == buttons[33]:
                     running = False
                     switch_scene(game_world_draw)
-                    return args[0]
+                    return arg[0]
 
-        for button in buttons:
-            button.check_hover(pygame.mouse.get_pos())
-            button.draw(screen)
         if icon_selected:
             cur = con.cursor()
             if chosen_unit != '' and chosen_building == '':
@@ -1490,7 +1491,7 @@ def castle_draw(*arg):
                 screen.blit(t, (20, 850))
                 screen.blit(t_1, (20, 900))
         pygame.display.flip()
-        return args[0]
+    return args
 
 
 switch_scene(game_world_draw)

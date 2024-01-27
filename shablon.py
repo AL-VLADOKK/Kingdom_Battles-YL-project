@@ -36,15 +36,15 @@ class Hero:
     coast_lvl_up_exp = [10, 30, 60, 100, 150, 220, 330, 500, 700, 1000]
     sum_give_characteristics = [1, 1, 2, 2, 2, 3, 3, 3, 3, 4]
     d_give_characteristics = {0: lambda: random_two_nubers(1, 0) + (0, 0),
-                            1: lambda: random_two_nubers(1, 0) + (0, 0),
-                            2: lambda: random_two_nubers(1, 0) + (0, 0),
-                            3: lambda: random_two_nubers(2, 0) + (0, 0),
-                            4: lambda: random_two_nubers(2, 0) + random_two_nubers(1, 0),
-                            5: lambda: random_two_nubers(3, 1) + (0, 0),
-                            6: lambda: random_two_nubers(3, 1) + (0, 0),
-                            7: lambda: random_two_nubers(3, 1) + (0, 0),
-                            8: lambda: random_two_nubers(3, 1) + (0, 0),
-                            9: lambda: random_two_nubers(4, 1) + random_two_nubers(2, 0)}
+                              1: lambda: random_two_nubers(1, 0) + (0, 0),
+                              2: lambda: random_two_nubers(1, 0) + (0, 0),
+                              3: lambda: random_two_nubers(2, 0) + (0, 0),
+                              4: lambda: random_two_nubers(2, 0) + random_two_nubers(1, 0),
+                              5: lambda: random_two_nubers(3, 1) + (0, 0),
+                              6: lambda: random_two_nubers(3, 1) + (0, 0),
+                              7: lambda: random_two_nubers(3, 1) + (0, 0),
+                              8: lambda: random_two_nubers(3, 1) + (0, 0),
+                              9: lambda: random_two_nubers(4, 1) + random_two_nubers(2, 0)}
 
     def __init__(self, *args):
         self.number, self.id = args
@@ -83,7 +83,8 @@ class Hero:
 
         id_arm = 3 if self.id == 2 else 5
         arms = cur.execute("""SELECT peasant, penny, swordman, knight, archer,
-                crossbowman, cleric, abbot, angel, horseman from army WHERE id = ?""", (id_arm,)).fetchone()
+                crossbowman, cleric, abbot, master_of_light_and_might, horseman from army WHERE id = ?""",
+                           (id_arm,)).fetchone()
 
         for i in range(len(arms)):
             if len(self.slots_army) >= 6:

@@ -79,14 +79,14 @@ class RedCastle:
         db = os.path.join('data/db', db)
         self.con = sqlite3.connect(db)
         self.list_l = ['lvl', 'horse_stable', 'marketplace', 'militia', 'pennies', 'swordmans', 'knights', 'archer',
-                       'crossbowman', 'cleric', 'abbot', 'angel', 'horseman']
+                       'crossbowman', 'cleric', 'abbot', 'master_of_light_and_might', 'horseman']
         self.buying_army = {}
         self.load_data()
 
     def load_data(self):
         cur = self.con.cursor()
         result = cur.execute("""SELECT lvl, horse_stable, marketplace, militia, pennies, swordmans, knights, archer, 
-        crossbowman, cleric, abbot, angel, horseman FROM castles WHERE id = 2""").fetchone()
+        crossbowman, cleric, abbot, master_of_light_and_might, horseman FROM castles WHERE id = 2""").fetchone()
         for i in range(len(self.list_l)):
             self.building[self.list_l[i]] = result[i]
         for i in range(10):
@@ -203,14 +203,14 @@ class BlueCastle:
         db = os.path.join('data/db', db)
         self.con = sqlite3.connect(db)
         self.list_l = ['lvl', 'horse_stable', 'marketplace', 'militia', 'pennies', 'swordmans', 'knights', 'archer',
-                       'crossbowman', 'cleric', 'abbot', 'angel', 'horseman']
+                       'crossbowman', 'cleric', 'abbot', 'master_of_light_and_might', 'horseman']
         self.buying_army = {}
         self.load_data()
 
     def load_data(self):
         cur = self.con.cursor()
         result = cur.execute("""SELECT lvl, horse_stable, marketplace, militia, pennies, swordmans, knights, archer, 
-        crossbowman, cleric, abbot, angel, horseman FROM castles WHERE id = 3""").fetchone()
+        crossbowman, cleric, abbot, master_of_light_and_might, horseman FROM castles WHERE id = 3""").fetchone()
         for i in range(len(self.list_l)):
             self.building[self.list_l[i]] = result[i]
         for i in range(10):
