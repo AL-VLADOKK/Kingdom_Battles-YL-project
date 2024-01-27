@@ -1028,7 +1028,7 @@ def castle_draw(*args):
         if user_id == 2:
             castle_buying_id = 7
             castle_army_id = 4
-        elif user_id == 2:
+        elif user_id == 3:
             castle_buying_id = 8
             castle_army_id = 6
 
