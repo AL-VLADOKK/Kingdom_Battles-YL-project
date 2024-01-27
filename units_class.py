@@ -15,10 +15,7 @@ class Unit:
 
     r_d = {}
     for k, v in d.items():
-        if k != 'M':
-            r_d[v] = k
-        else:
-            r_d['angel'] = k
+        r_d[v] = k
 
     d_in_id = {'peasant': 0,
                'penny': 1,
@@ -33,10 +30,7 @@ class Unit:
 
     id_in_d = {}
     for k, v in d_in_id.items():
-        if k != 'master_of_light_and_might':
-            id_in_d[v] = k
-        else:
-            id_in_d[v] = 'angel'
+        id_in_d[v] = k
 
     def __init__(self, chr):
         db = "GameDB.db3"
@@ -68,4 +62,4 @@ class Unit:
                 3 - 2 // self.initiative) * self.health_points
         point_one = int(point_one * (1 + (self.luck + luck) // 10) if self.luck + luck else point_one)
         point_one = int(point_one * (1 + (self.inspiration + inspiration) // 10) if self.luck + luck else point_one)
-        return point_one * 2
+        return point_one

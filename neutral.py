@@ -34,15 +34,13 @@ def battle_scoring(hero_units, additional_h, neutrals, additional_e=(0, 0, 0, 0)
                 if unit <= casualties:
                     casualties -= unit
                 else:
-                    print(f'нейтрал{hero_units[i][0].scroll(0, 0, 0, 0)}')
-                    print(f'{unit - casualties} // {hero_units[i][0].scroll(*additional_h)}')
-                    print(hero_units[i][0].point_to_health(*additional_h))
                     survivors.append([hero_units[i][0], int(((unit - casualties) // int(hero_units[i][0].point_to_health(*additional_h))))])
                     survivors += hero_units[i + 1:]
                     break
 
         survivors = tuple(survivors) + tuple(False for _ in range(6 - len(survivors)))
-        return True, list(survivors), 0
+        print(casualties)
+        return True, list(survivors), casualties // 10
     else:
         return False,
 

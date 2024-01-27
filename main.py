@@ -728,6 +728,7 @@ def game_world_draw(*args):
                         if result[0]:
                             players_hero[id_hero].give_exp(result[2])
                             players_hero[id_hero].slots_army = result[1]
+                            players_hero[id_hero].load_db()
                             map[players_hero[id_hero].y_hero + preparation_window[2][0]][
                                 players_hero[id_hero].x_hero + preparation_window[2][1]], \
                             map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
@@ -835,7 +836,7 @@ def hero_characteristics(*args):
          'cleric': load_image('clerick_ikonka.png'),
          'abbot': load_image('abbot_ikonka.png'),
          'horseman': load_image('vsadnik_ikonka.png'),
-         'master of light and might': load_image('angel_ikonka.png')}
+         'master_of_light_and_might': load_image('angel_ikonka.png')}
     board = load_image('board.png', colorkey=-1)
     m_arm = load_image('12620557_4Z_2101.w017.n001.350A.p30.350.png', colorkey=-1)
 
@@ -859,7 +860,6 @@ def hero_characteristics(*args):
                 if e.button == button:
                     running = False
                     switch_scene(game_world_draw)
-                    return args[0]
         button.check_hover(pygame.mouse.get_pos())
         screen.blit(load_image(image), (0, 0))
         button.check_hover(pygame.mouse.get_pos())
@@ -1202,7 +1202,7 @@ def castle_draw(*args):
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 running = False
-            #   switch_scene(None)
+                switch_scene(game_world_draw)
             for button in buttons:
                 button.handle_event(e)
             if e.type == pygame.USEREVENT:
@@ -1436,7 +1436,6 @@ def castle_draw(*args):
                 elif e.button == buttons[33]:
                     running = False
                     switch_scene(game_world_draw)
-                    return arg[0]
 
         if icon_selected:
             cur = con.cursor()
@@ -1491,7 +1490,7 @@ def castle_draw(*args):
                 screen.blit(t, (20, 850))
                 screen.blit(t_1, (20, 900))
         pygame.display.flip()
-    return args
+    return args[0]
 
 
 switch_scene(game_world_draw)

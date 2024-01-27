@@ -27,13 +27,13 @@ class AnimatedSprite(pygame.sprite.Sprite):
 
 
 def random_two_nubers(sum, min):
-    a = random.randint(min, sum - min)
+    a = random.randint(min, sum - min + 1)
     b = sum - a
-    return (a, b)
+    return a, b
 
 
 class Hero:
-    coast_lvl_up_exp = [10, 30, 60, 100, 150, 220, 330, 500, 700, 1000]
+    coast_lvl_up_exp = [100, 300, 600, 1000, 1500, 2200, 3300, 5000, 7000, 10000]
     sum_give_characteristics = [1, 1, 2, 2, 2, 3, 3, 3, 3, 4]
     d_give_characteristics = {0: lambda: random_two_nubers(1, 0) + (0, 0),
                               1: lambda: random_two_nubers(1, 0) + (0, 0),
@@ -63,7 +63,7 @@ class Hero:
         result = cur.execute("""SELECT * FROM heroes WHERE id = ?""", (self.id,)).fetchone()
         self.name = result[1]
         self.chr = 'A' if self.name == 'red_hero' else 'B'
-        self.steps = 999999
+        self.steps = result[2]
         self.attack = result[3]
         self.protection = result[4]
         self.inspiration = result[5]
@@ -83,7 +83,7 @@ class Hero:
 
         id_arm = 3 if self.id == 2 else 5
         arms = cur.execute("""SELECT peasant, penny, swordman, knight, archer,
-                crossbowman, cleric, abbot, master_of_light_and_might, horseman from army WHERE id = ?""",
+                crossbowman, cleric, abbot, horseman, master_of_light_and_might from army WHERE id = ?""",
                            (id_arm,)).fetchone()
 
         for i in range(len(arms)):
@@ -112,7 +112,7 @@ class Hero:
 
         id_arm = 3 if self.id == 2 else 5
         cur.execute("""UPDATE army SET peasant = ?, penny = ?, swordman = ?, knight = ?, archer = ?,
-                crossbowman = ?, cleric = ?, abbot = ?, angel = ?, horseman = ? WHERE id = ?""",
+                crossbowman = ?, cleric = ?, abbot = ?, horseman = ?, master_of_light_and_might = ? WHERE id = ?""",
                     (arm[0], arm[1], arm[2], arm[3], arm[4], arm[5],
                      arm[6], arm[7], arm[8], arm[9], id_arm))
         self.con.commit()
@@ -174,7 +174,7 @@ class Hero:
                 self.exp = Hero.coast_lvl_up_exp[9]
 
     def level_up(self):
-        a, p, i, l = Hero.d_give_characteristics[self.level]
+        a, p, i, l = Hero.d_give_characteristics[self.level]()
         self.attack += a
         self.protection += p
         self.inspiration += i
