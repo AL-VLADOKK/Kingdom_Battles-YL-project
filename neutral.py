@@ -34,8 +34,12 @@ def battle_scoring(hero_units, additional_h, neutrals, additional_e=(0, 0, 0, 0)
                 if unit <= casualties:
                     casualties -= unit
                 else:
-                    survivors.append([hero_units[i][0], int(((unit - casualties) // int(hero_units[i][0].scroll(*additional_h))))])
+                    print(f'нейтрал{hero_units[i][0].scroll(0, 0, 0, 0)}')
+                    print(f'{unit - casualties} // {hero_units[i][0].scroll(*additional_h)}')
+                    print(hero_units[i][0].point_to_health(*additional_h))
+                    survivors.append([hero_units[i][0], int(((unit - casualties) // int(hero_units[i][0].point_to_health(*additional_h))))])
                     survivors += hero_units[i + 1:]
+                    break
 
         survivors = tuple(survivors) + tuple(False for _ in range(6 - len(survivors)))
         return True, list(survivors), 0
@@ -80,25 +84,25 @@ def draw_preparation_window(army1, army2):
                 pygame.transform.scale(m_arm,
                                        (int(rect[2] * 0.15), int(rect[2] * 0.15))),
                 (int(rect[2] * x // 100), int(rect[3] * y // 100)))
-            if army1[i * ii - 1]:
+            if type(army1[ii + ((i - 1) * 3) - 1]) != bool:
                 board_img.blit(
-                    pygame.transform.scale(d[army1[i * ii - 1][0].name],
+                    pygame.transform.scale(d[army1[ii + ((i - 1) * 3) - 1][0].name],
                                            (int(rect[2] * 0.15 * 0.95), int(rect[2] * 0.15 * 0.95))),
                     (int(rect[2] * (x / 100)), int(rect[3] * (y / 100))))
                 font = pygame.font.Font(None, 500)
-                text_surface = font.render(str(army1[i * ii - 1][1]), True, (218, 165, 32))
+                text_surface = font.render(str(army1[ii + ((i - 1) * 3) - 1][1]), True, (218, 165, 32))
                 board_img.blit(text_surface, (int(rect[2] * (x + 5) / 100), int(rect[3] * (y + 22) / 100)))
         for x, ii in zip(range(50, 81, 15), range(1, 4)):
             board_img.blit(
                 pygame.transform.scale(m_arm,
                                        (int(rect[2] * 0.15), int(rect[2] * 0.15))),
                 (int(rect[2] * x // 100), int(rect[3] * y // 100)))
-            if army2[i * ii - 1]:
+            if type(army2[ii + ((i - 1) * 3) - 1]) != bool:
                 board_img.blit(
-                    pygame.transform.scale(d[army2[i * ii - 1][0].name],
+                    pygame.transform.scale(d[army2[ii + ((i - 1) * 3) - 1][0].name],
                                            (int(rect[2] * 0.15 * 0.95), int(rect[2] * 0.15 * 0.95))),
                     (int(rect[2] * (x / 100)), int(rect[3] * (y / 100))))
                 font = pygame.font.Font(None, 500)
-                text_surface = font.render(str(army2[i * ii - 1][1]), True, (218, 165, 32))
+                text_surface = font.render(str(army2[ii + ((i - 1) * 3) - 1][1]), True, (218, 165, 32))
                 board_img.blit(text_surface, (int(rect[2] * (x + 5) / 100), int(rect[3] * (y + 22) / 100)))
     return board_img

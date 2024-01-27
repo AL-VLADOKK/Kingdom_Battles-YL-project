@@ -87,7 +87,7 @@ class Hero:
                            (id_arm,)).fetchone()
 
         for i in range(len(arms)):
-            if len(self.slots_army) >= 6:
+            if len(self.slots_army) > 5:
                 pass
             else:
                 if arms[i] != 0:

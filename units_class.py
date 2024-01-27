@@ -1,5 +1,6 @@
 import pygame, os, sqlite3
 
+
 class Unit:
     d = {'k': 'peasant',
          'K': 'penny',
@@ -62,9 +63,9 @@ class Unit:
         point_one = int(point_one * (1 + (self.inspiration + inspiration) // 10) if self.luck + luck else point_one)
         return point_one
 
-    def point_to_health(self, damage, protection, inspiration, luck, points):
-        points = int(points / (1 + (self.inspiration + inspiration) // 10) if self.luck + luck else points)
-        points = int(points / (1 + (self.luck + luck) // 10) if self.luck + luck else points)
-        health = points / (self.damage + damage + self.protection + protection) * (
-                3 - 2 // self.initiative)
-        return int(health)
+    def point_to_health(self, damage, protection, inspiration, luck):
+        point_one = (self.damage + damage + self.protection + protection) * (
+                3 - 2 // self.initiative) * self.health_points
+        point_one = int(point_one * (1 + (self.luck + luck) // 10) if self.luck + luck else point_one)
+        point_one = int(point_one * (1 + (self.inspiration + inspiration) // 10) if self.luck + luck else point_one)
+        return point_one * 2

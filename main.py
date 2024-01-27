@@ -289,7 +289,7 @@ def select_map_2():
 
 
 def game_world_draw(*args):
-    args = args
+    args = args[0]
     flag_data = True if len(args) > 1 else False
     link_map = args[0]
 
@@ -302,6 +302,8 @@ def game_world_draw(*args):
     window = pygame.transform.scale(screen, res)
     surface = pygame.display.get_surface()
     size = [surface.get_width(), surface.get_height()]
+
+    can_add_new_building = True if not flag_data else args[16]
 
     clock = pygame.time.Clock()
 
@@ -453,12 +455,12 @@ def game_world_draw(*args):
         steps_current_hero -= 1
         if not chr_to_replace:
             map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x], \
-                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
-                    map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x]
+                map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x]
         else:
             map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x], \
-                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], chr_to_replace
         players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero + direction_y,
                                               players_hero[id_hero].x_hero + direction_x)
@@ -634,7 +636,7 @@ def game_world_draw(*args):
                                                                         neutral_in_arms(neutral_dict[(
                                                                             players_hero[id_hero].y_hero,
                                                                             players_hero[id_hero].x_hero - 1)])), (
-                            0, -1)
+                                             0, -1)
                     elif any(chr_go == i for i in 'AB'):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (0, -1)
@@ -728,7 +730,7 @@ def game_world_draw(*args):
                             players_hero[id_hero].slots_army = result[1]
                             map[players_hero[id_hero].y_hero + preparation_window[2][0]][
                                 players_hero[id_hero].x_hero + preparation_window[2][1]], \
-                                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], '-'
                             players_hero[id_hero].set_hero_coords(
                                 players_hero[id_hero].y_hero + preparation_window[2][0],
@@ -806,15 +808,12 @@ def game_world_draw(*args):
             pygame.display.set_caption('FPS: ' + str(round(clock.get_fps())))
             chunks_on_screen((cam_x, cam_y), chunk_size, tile_size, res, (world_size_chunk_x, world_size_chunk_y))
     return link_map, (cam_x,
-                      cam_y), chunk_size, tile_size, map, one_player_fog_war, two_player_fog_war, world_size_chunk_x, world_size_chunk_y, sum_day, flag_player, players_hero, steps_current_hero, current_fog, frame, winner
+                      cam_y), chunk_size, tile_size, map, one_player_fog_war, two_player_fog_war, world_size_chunk_x, world_size_chunk_y, sum_day, flag_player, players_hero, steps_current_hero, current_fog, frame, winner, can_add_new_building
 
 
 def hero_characteristics(*args):
     args = args[0]
-    print(args)
     heroes, flag_player = args[11], args[10]
-    print(args[10])
-    print(flag_player)
     if flag_player:
         flag_player = 0
     else:
@@ -982,26 +981,26 @@ def result_window(*args):
                     pygame.transform.scale(m_arm,
                                            (int(size[0] * 0.05), int(size[0] * 0.05))),
                     (int(size[0] * x // 100), int(size[1] * y // 100)))
-                if army1[i * ii - 1]:
+                if type(army1[ii + ((i - 1) * 3) - 1]) != bool:
                     screen.blit(
-                        pygame.transform.scale(d[army1[i * ii - 1][0].name],
+                        pygame.transform.scale(d[army1[ii + ((i - 1) * 3) - 1][0].name],
                                                (int(size[0] * 0.05 * 0.95), int(size[0] * 0.05 * 0.95))),
                         (int(size[0] * (x / 100)), int(size[1] * (y / 100))))
                     font = pygame.font.Font(None, 50)
-                    text_surface = font.render(str(army1[i * ii - 1][1]), True, (218, 165, 32))
+                    text_surface = font.render(str(army1[ii + ((i - 1) * 3) - 1][1]), True, (218, 165, 32))
                     screen.blit(text_surface, (int(size[0] * (x + 2) / 100), int(size[1] * (y + 5) / 100)))
             for x, ii in zip(range(60, 81, 10), range(1, 4)):
                 screen.blit(
                     pygame.transform.scale(m_arm,
                                            (int(size[0] * 0.05), int(size[0] * 0.05))),
                     (int(size[0] * x // 100), int(size[1] * y // 100)))
-                if army2[i * ii - 1]:
+                if type(army2[ii + ((i - 1) * 3) - 1]) != bool:
                     screen.blit(
-                        pygame.transform.scale(d[army2[i * ii - 1][0].name],
+                        pygame.transform.scale(d[army2[ii + ((i - 1) * 3) - 1][0].name],
                                                (int(size[0] * 0.05 * 0.95), int(size[0] * 0.05 * 0.95))),
                         (int(size[0] * (x / 100)), int(size[1] * (y / 100))))
                     font = pygame.font.Font(None, 50)
-                    text_surface = font.render(str(army2[i * ii - 1][1]), True, (218, 165, 32))
+                    text_surface = font.render(str(army2[ii + ((i - 1) * 3) - 1][1]), True, (218, 165, 32))
                     screen.blit(text_surface, (int(size[0] * (x + 2) / 100), int(size[1] * (y + 5) / 100)))
         button.draw(screen)
         pygame.display.flip()
@@ -1014,7 +1013,8 @@ def castle_draw(*args):
         user_id = 2
     else:
         user_id = 3
-    can_add_new_building = True
+    arg = arg[0]
+    can_add_new_building = arg[16]
     hero_in_castle = True
     icon_width = 125
     icon_height = 155
@@ -1495,7 +1495,7 @@ def castle_draw(*args):
 
 
 switch_scene(game_world_draw)
-data_game = 'data/maps/map_1.txt'
+data_game = 'data/maps/map_1.txt',
 while current_scene is not None:
     data_game = current_scene(data_game)
 pygame.quit()
