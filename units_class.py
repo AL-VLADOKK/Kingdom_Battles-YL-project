@@ -1,6 +1,5 @@
 import pygame, os, sqlite3
 
-
 class Unit:
     d = {'k': 'peasant',
          'K': 'penny',
@@ -11,7 +10,8 @@ class Unit:
          'c': 'cleric',
          'C': 'abbot',
          'H': 'horseman',
-         'M': 'master of light and might'}
+         'M': 'master_of_light_and_might'}
+
     r_d = {}
     for k, v in d.items():
         if k != 'M':
@@ -28,11 +28,11 @@ class Unit:
                'cleric': 6,
                'abbot': 7,
                'horseman': 8,
-               'master of light and might': 9}
+               'master_of_light_and_might': 9}
 
     id_in_d = {}
     for k, v in d_in_id.items():
-        if k != 'master of light and might':
+        if k != 'master_of_light_and_might':
             id_in_d[v] = k
         else:
             id_in_d[v] = 'angel'

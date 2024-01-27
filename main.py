@@ -289,7 +289,7 @@ def select_map_2():
 
 
 def game_world_draw(*args):
-    args = args
+    args = args[0]
     flag_data = True if len(args) > 1 else False
     link_map = args[0]
 
@@ -302,6 +302,8 @@ def game_world_draw(*args):
     window = pygame.transform.scale(screen, res)
     surface = pygame.display.get_surface()
     size = [surface.get_width(), surface.get_height()]
+
+    can_add_new_building = True if not flag_data else args[16]
 
     clock = pygame.time.Clock()
 
@@ -701,11 +703,19 @@ def game_world_draw(*args):
                     else:
                         two_player_fog_war = current_fog[:]
                         current_fog = one_player_fog_war[:]
+                    can_add_new_building = True if not flag_data else args[16]
+                    if flag_player:
+                        a = RedCastle()
+                        a.add_buying_army()
+                    else:
+                        a = BlueCastle()
+                        a.add_buying_army()
                 elif e.button == buttons[2] and not preparation_window[0]:
                     switch_scene(basic_menu_draw)
                     running = False
                 elif e.button == buttons[3] and not preparation_window[0]:
-                    print(4)
+                    switch_scene(castle_draw)
+                    running = False
                 elif e.button == buttons_board[0] and preparation_window[0]:
                     if preparation_window[0] == 1:
                         result = battle_enemis_scoring(players_hero[id_hero].slots_army, (
@@ -995,10 +1005,19 @@ def result_window(*args):
         pygame.display.flip()
 
 
-def castle_draw(user_id, can_add_new_building, hero_in_castle=False):
-    # user_id = 0
-    # can_add_new_building = 0
-    # hero_in_castle = False
+def castle_draw(*args):
+    print(args)
+    args = args[0]
+    print(args)
+    flag_player = args[10]
+    print(args)
+    if flag_player:
+        user_id = 2
+    else:
+        user_id = 3
+    args = args[0]
+    can_add_new_building = args[16]
+    hero_in_castle = True
     icon_width = 125
     icon_height = 155
     db = "GameDB.db3"
@@ -1014,6 +1033,7 @@ def castle_draw(user_id, can_add_new_building, hero_in_castle=False):
         elif user_id == 2:
             castle_buying_id = 8
             castle_army_id = 6
+
         cur = con.cursor()
         units = cur.execute("""SELECT unit_name FROM units """).fetchall()
         buying_values = []
@@ -1124,24 +1144,24 @@ def castle_draw(user_id, can_add_new_building, hero_in_castle=False):
                ImageButton(1025, 845, 200, 200, '', 'coin_ikonka.png',
                            hover_image_path='coin_ikonka.png'),
 
-               ImageButton(220, 210, 200, 200, '', 'sheaf_spears.jpg',
-                           hover_image_path='sheaf_spears.jpg'),
+               ImageButton(220, 210, 200, 200, '', 'spear_ikonka.png',
+                           hover_image_path='spear_ikonka.png'),
                ImageButton(220, 420, 200, 200, '', 'knight_buying_ikonka.jpg',
                            hover_image_path='knight_buying_ikonka.jpg'),
-               ImageButton(530, 210, 200, 200, '', 'coin_ikonka.png',
-                           hover_image_path='coin_ikonka.png'),
-               ImageButton(840, 210, 200, 200, '', 'coin_ikonka.png',
-                           hover_image_path='coin_ikonka.png'),
-               ImageButton(530, 420, 200, 200, '', 'coin_ikonka.png',
-                           hover_image_path='coin_ikonka.png'),
-               ImageButton(840, 420, 200, 200, '', 'coin_ikonka.png',
-                           hover_image_path='coin_ikonka.png'),
-               ImageButton(220, 630, 200, 200, '', 'coin_ikonka.png',
-                           hover_image_path='coin_ikonka.png'),
-               ImageButton(530, 630, 200, 200, '', 'coin_ikonka.png',
-                           hover_image_path='coin_ikonka.png'),
-               ImageButton(840, 630, 200, 200, '', 'coin_ikonka.png',
-                           hover_image_path='coin_ikonka.png'),
+               ImageButton(530, 210, 200, 200, '', 'marketplace_ikonka.png',
+                           hover_image_path='marketplace_ikonka.png'),
+               ImageButton(840, 210, 200, 200, '', 'luk_ikonka.png',
+                           hover_image_path='luk_ikonka.png'),
+               ImageButton(530, 420, 200, 200, '', 'krest_ikonka.png',
+                           hover_image_path='krest_ikonka.png'),
+               ImageButton(840, 420, 200, 200, '', 'karta_ikonka.png',
+                           hover_image_path='karta_ikonka.png'),
+               ImageButton(220, 630, 200, 200, '', 'sobor_ikonka.png',
+                           hover_image_path='sobor_ikonka.png'),
+               ImageButton(530, 630, 200, 200, '', 'altar_ikonka.png',
+                           hover_image_path='altar_ikonka.png'),
+               ImageButton(840, 630, 200, 200, '', 'kon_ikonka.png',
+                           hover_image_path='kon_ikonka.png'),
 
                ImageButton(0, 210, 200, 200, '', 'lvl_1_ikonka.png',
                            hover_image_path='lvl_1_ikonka.png'),
@@ -1244,10 +1264,10 @@ def castle_draw(user_id, can_add_new_building, hero_in_castle=False):
                 elif e.button == buttons[8] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
-                        r.add_army_to_hero('angel')
+                        r.add_army_to_hero('master_of_light_and_might')
                     elif user_id == 3:
                         b = BlueCastle()
-                        b.add_army_to_hero('angel')
+                        b.add_army_to_hero('master_of_light_and_might')
                 elif e.button == buttons[9] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1297,8 +1317,8 @@ def castle_draw(user_id, can_add_new_building, hero_in_castle=False):
                     chosen_building = chosen_building_rus = ''
                     icon_selected = True
                 elif e.button == buttons[18]:
-                    chosen_unit = 'angel'
-                    chosen_unit_rus = 'Ангел'
+                    chosen_unit = 'master_of_light_and_might'
+                    chosen_unit_rus = 'Мастер меча и магии'
                     chosen_building = chosen_building_rus = ''
                     icon_selected = True
                 elif e.button == buttons[19]:
@@ -1413,8 +1433,9 @@ def castle_draw(user_id, can_add_new_building, hero_in_castle=False):
                     icon_selected = True
 
                 elif e.button == buttons[33]:
-                    switch_scene(game_world_draw)
                     running = False
+                    switch_scene(game_world_draw)
+                    return args[0]
 
         for button in buttons:
             button.check_hover(pygame.mouse.get_pos())
@@ -1424,43 +1445,59 @@ def castle_draw(user_id, can_add_new_building, hero_in_castle=False):
             if chosen_unit != '' and chosen_building == '':
                 price = cur.execute("""SELECT price FROM units WHERE unit_name = ?""",
                                     (chosen_unit,)).fetchone()
-                description = f'{chosen_unit_rus}: стоимость - {price[0]} золота'
-                t = pygame.font.SysFont('arial', 45).render(description, True, (255, 255, 255))
+                description_1 = f'{chosen_unit_rus}:'
+                description_2 = f'стоимость - {price[0]} золота'
+                t = pygame.font.SysFont('arial', 45).render(description_1, True, (255, 255, 255))
+                t_1 = pygame.font.SysFont('arial', 45).render(description_2, True, (255, 255, 255))
                 screen.blit(t, (20, 850))
+                screen.blit(t_1, (20, 900))
             elif chosen_unit == '' and chosen_building == 'lvl1':
-                description = f'{chosen_building_rus}: здание уже построено'
-                t = pygame.font.SysFont('arial', 35).render(description, True, (255, 255, 255))
+                description_1 = f'{chosen_building_rus}:'
+                description_2 = 'здание уже построено'
+                t = pygame.font.SysFont('arial', 35).render(description_1, True, (255, 255, 255))
+                t_1 = pygame.font.SysFont('arial', 45).render(description_2, True, (255, 255, 255))
                 screen.blit(t, (20, 850))
+                screen.blit(t_1, (20, 900))
             elif chosen_unit == '' and chosen_building != '' and building_value['lvl'] == 1:
                 price = cur.execute("""SELECT gold, wood, rock, magic_cristalls FROM castle_units 
                                                     WHERE name = ?""", (chosen_building,)).fetchone()
-                description = (f'{chosen_building_rus}: стоимость - {price[0]} золота, {price[1]} дерева, '
-                               f'{price[2]} камня, {price[3]} магических кристаллов')
-                t = pygame.font.SysFont('arial', 35).render(description, True, (255, 255, 255))
+                description_1 = f'{chosen_building_rus}: стоимость - {price[0]} золота,'
+                description_2 = f'{price[1]} дерева, {price[2]} камня, {price[3]} магических кристаллов'
+                t = pygame.font.SysFont('arial', 35).render(description_1, True, (255, 255, 255))
+                t_1 = pygame.font.SysFont('arial', 45).render(description_2, True, (255, 255, 255))
                 screen.blit(t, (20, 850))
+                screen.blit(t_1, (20, 900))
             elif chosen_unit == '' and chosen_building != '' and building_value['lvl'] == 2:
                 price = cur.execute("""SELECT gold, wood, rock, magic_cristalls FROM castle_units 
                                                     WHERE name = ?""", (chosen_building,)).fetchone()
-                description = (f'{chosen_building_rus}: стоимость - {price[0]} золота, {price[1]} дерева, '
-                               f'{price[2]} камня, {price[3]} магических кристаллов')
-                t = pygame.font.SysFont('arial', 35).render(description, True, (255, 255, 255))
+                description_1 = f'{chosen_building_rus}: стоимость - {price[0]} золота,'
+                description_2 = f'{price[1]} дерева, {price[2]} камня, {price[3]} магических кристаллов'
+                t = pygame.font.SysFont('arial', 35).render(description_1, True, (255, 255, 255))
+                t_1 = pygame.font.SysFont('arial', 45).render(description_2, True, (255, 255, 255))
                 screen.blit(t, (20, 850))
+                screen.blit(t_1, (20, 900))
             elif chosen_unit == '' and chosen_building != '' and building_value[chosen_building] == 'no':
                 price = cur.execute("""SELECT gold, wood, rock, magic_cristalls FROM castle_units 
                                     WHERE name = ?""", (chosen_building,)).fetchone()
-                description = (f'{chosen_building_rus}: стоимость - {price[0]} золота, {price[1]} дерева, '
-                               f'{price[2]} камня, {price[3]} магических кристаллов')
-                t = pygame.font.SysFont('arial', 35).render(description, True, (255, 255, 255))
+                description_1 = f'{chosen_building_rus}: стоимость - {price[0]} золота,'
+                description_2 = f'{price[1]} дерева, {price[2]} камня, {price[3]} магических кристаллов'
+                t = pygame.font.SysFont('arial', 35).render(description_1, True, (255, 255, 255))
+                t_1 = pygame.font.SysFont('arial', 45).render(description_2, True, (255, 255, 255))
                 screen.blit(t, (20, 850))
+                screen.blit(t_1, (20, 900))
             elif chosen_unit == '' and chosen_building != '' and building_value[chosen_building] == 'yes':
-                description = f'{chosen_building_rus}: здание уже построено'
-                t = pygame.font.SysFont('arial', 35).render(description, True, (255, 255, 255))
+                description_1 = f'{chosen_building_rus}:'
+                description_2 = 'здание уже построено'
+                t = pygame.font.SysFont('arial', 35).render(description_1, True, (255, 255, 255))
+                t_1 = pygame.font.SysFont('arial', 45).render(description_2, True, (255, 255, 255))
                 screen.blit(t, (20, 850))
+                screen.blit(t_1, (20, 900))
         pygame.display.flip()
+        return args[0]
 
 
 switch_scene(game_world_draw)
-data_game = 'data/maps/map_1.txt'
+data_game = 'data/maps/map_1.txt',
 while current_scene is not None:
     data_game = current_scene(data_game)
 pygame.quit()
