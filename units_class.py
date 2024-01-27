@@ -44,6 +44,7 @@ class Unit:
 
         self.name = Unit.d[chr]
         cur = self.con.cursor()
+
         result = cur.execute("""SELECT * FROM units WHERE unit_name = ?""", (self.name,)).fetchone()
 
         self.motion = result[2]
@@ -57,13 +58,13 @@ class Unit:
     def scroll(self, damage, protection, inspiration, luck):
         point_one = (self.damage + damage + self.protection + protection) * (
                 3 - 2 // self.initiative) * self.health_points
-        point_one = point_one * (1 + (self.luck + luck) // 10) if self.luck + luck else point_one
+        point_one = int(point_one * (1 + (self.luck + luck) // 10) if self.luck + luck else point_one)
         point_one = int(point_one * (1 + (self.inspiration + inspiration) // 10) if self.luck + luck else point_one)
         return point_one
 
     def point_to_health(self, damage, protection, inspiration, luck, points):
-        points = points / (1 + (self.inspiration + inspiration) // 10) if self.luck + luck else points
-        points = points / (1 + (self.luck + luck) // 10) if self.luck + luck else points
+        points = int(points / (1 + (self.inspiration + inspiration) // 10) if self.luck + luck else points)
+        points = int(points / (1 + (self.luck + luck) // 10) if self.luck + luck else points)
         health = points / (self.damage + damage + self.protection + protection) * (
                 3 - 2 // self.initiative)
         return int(health)

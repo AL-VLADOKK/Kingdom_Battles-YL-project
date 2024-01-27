@@ -24,20 +24,22 @@ def neutral_in_arms(netr):
 
 def battle_scoring(hero_units, additional_h, neutrals, additional_e=(0, 0, 0, 0)):
     hero_units, neutrals = list(hero_units), list(neutrals)
-    if sum(i[1] * i[0].scroll(*additional_h) for i in hero_units if type(i) != bool) >= sum(i[1] * int(i[0].scroll(*additional_e)) for i in neutrals if type(i) != bool):
-        casualties = sum(i[1] * i[0].scroll(*additional_e) for i in neutrals if type(i) != bool)
+    if sum(i[1] * i[0].scroll(*additional_h) for i in hero_units if type(i) != bool) >= sum(
+            i[1] * int(i[0].scroll(*additional_e)) for i in neutrals if type(i) != bool):
+        casualties = int(sum(i[1] * i[0].scroll(*additional_e) for i in neutrals if type(i) != bool))
         survivors = []
-        for i in hero_units:
-            if type(i) != bool:
-                unit = i[1] * i[0].scroll(*additional_h)
+        for i in range(len(hero_units)):
+            if type(hero_units[i]) != bool:
+                print(hero_units[i])
+                unit = hero_units[i][1] * hero_units[i][0].scroll(*additional_h)
                 if unit <= casualties:
                     casualties -= unit
                 else:
-                    survivors.append([i[0], -1 * int(-(
-                            (i[1] * i[0].health_points - i[1].point_to_health(*additional_h, casualties)) / i[
-                        0].health_points))])
-            survivors = tuple(survivors) + tuple(False for _ in range(6 - len(survivors)))
-            return True, survivors, 0
+                    survivors.append([hero_units[i][0], int(((unit - casualties) // int(hero_units[i][0].scroll(*additional_h))))])
+                    survivors += hero_units[i + 1:]
+
+        survivors = tuple(survivors) + tuple(False for _ in range(6 - len(survivors)))
+        return True, list(survivors), 0
     else:
         return False,
 
@@ -81,7 +83,8 @@ def draw_preparation_window(army1, army2):
                 (int(rect[2] * x // 100), int(rect[3] * y // 100)))
             if army1[i * ii - 1]:
                 board_img.blit(
-                    pygame.transform.scale(d[army1[i * ii - 1][0].name], (int(rect[2] * 0.15 * 0.95), int(rect[2] * 0.15 * 0.95))),
+                    pygame.transform.scale(d[army1[i * ii - 1][0].name],
+                                           (int(rect[2] * 0.15 * 0.95), int(rect[2] * 0.15 * 0.95))),
                     (int(rect[2] * (x / 100)), int(rect[3] * (y / 100))))
                 font = pygame.font.Font(None, 500)
                 text_surface = font.render(str(army1[i * ii - 1][1]), True, (218, 165, 32))
@@ -93,7 +96,8 @@ def draw_preparation_window(army1, army2):
                 (int(rect[2] * x // 100), int(rect[3] * y // 100)))
             if army2[i * ii - 1]:
                 board_img.blit(
-                    pygame.transform.scale(d[army2[i * ii - 1][0].name], (int(rect[2] * 0.15 * 0.95), int(rect[2] * 0.15 * 0.95))),
+                    pygame.transform.scale(d[army2[i * ii - 1][0].name],
+                                           (int(rect[2] * 0.15 * 0.95), int(rect[2] * 0.15 * 0.95))),
                     (int(rect[2] * (x / 100)), int(rect[3] * (y / 100))))
                 font = pygame.font.Font(None, 500)
                 text_surface = font.render(str(army2[i * ii - 1][1]), True, (218, 165, 32))
