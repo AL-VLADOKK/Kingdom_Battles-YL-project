@@ -30,7 +30,6 @@ def battle_scoring(hero_units, additional_h, neutrals, additional_e=(0, 0, 0, 0)
         survivors = []
         for i in range(len(hero_units)):
             if type(hero_units[i]) != bool:
-                print(hero_units[i])
                 unit = hero_units[i][1] * hero_units[i][0].scroll(*additional_h)
                 if unit <= casualties:
                     casualties -= unit

@@ -289,7 +289,7 @@ def select_map_2():
 
 
 def game_world_draw(*args):
-    args = args[0]
+    args = args
     flag_data = True if len(args) > 1 else False
     link_map = args[0]
 
@@ -703,7 +703,7 @@ def game_world_draw(*args):
                     else:
                         two_player_fog_war = current_fog[:]
                         current_fog = one_player_fog_war[:]
-                    can_add_new_building = True if not flag_data else args[16]
+                    can_add_new_building = True
                     if flag_player:
                         a = RedCastle()
                         a.add_buying_army()
@@ -811,7 +811,6 @@ def game_world_draw(*args):
 
 def hero_characteristics(*args):
     args = args[0]
-    print(args)
     heroes, flag_player = args[11], args[10]
     if flag_player:
         flag_player = 0
@@ -1005,12 +1004,10 @@ def result_window(*args):
         pygame.display.flip()
 
 
-def castle_draw(*args):
-    print(args)
-    args = args[0]
-    print(args)
+def castle_draw(*arg):
+
+    args = list(arg[0])
     flag_player = args[10]
-    print(args)
     if flag_player:
         user_id = 2
     else:
@@ -1497,7 +1494,7 @@ def castle_draw(*args):
 
 
 switch_scene(game_world_draw)
-data_game = 'data/maps/map_1.txt',
+data_game = 'data/maps/map_1.txt'
 while current_scene is not None:
     data_game = current_scene(data_game)
 pygame.quit()
