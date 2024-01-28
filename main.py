@@ -1,7 +1,6 @@
 from menu_start import BasicMenu
 from load_db import return_to_original_db
 from func_load_image import load_image
-from load_db import load_db
 from buton import ImageButton
 from shablon import Hero, AnimatedSprite
 from fog_war import create_fog_war, change_fog_war
@@ -560,6 +559,8 @@ def game_world_draw(*args):
                     elif any(chr_go == i for i in 'AB'):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (-1, 0)
+                    elif chr_go == '@' if players_hero[id_hero].chr == 'A' else '$':
+                        pass # Слав тут нужно включить замок, тут игрок около него
                 elif (e.key == pygame.K_DOWN or e.key == pygame.K_KP2) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero]
                     if chr_go == '-':
@@ -602,6 +603,8 @@ def game_world_draw(*args):
                     elif any(chr_go == i for i in 'AB'):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (1, 0)
+                    elif chr_go == '@' if players_hero[id_hero].chr == 'A' else '$':
+                        pass # Слав тут нужно включить замок, тут игрок около него
                 elif (e.key == pygame.K_LEFT or e.key == pygame.K_KP4) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
                     if chr_go == '-':
@@ -650,6 +653,8 @@ def game_world_draw(*args):
                     elif any(chr_go == i for i in 'AB'):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (0, -1)
+                    elif chr_go == '@' if players_hero[id_hero].chr == 'A' else '$':
+                        pass # Слав тут нужно включить замок, тут игрок около него
                 elif (e.key == pygame.K_RIGHT or e.key == pygame.K_KP6) and steps_current_hero:
 
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1]
@@ -692,6 +697,8 @@ def game_world_draw(*args):
                     elif any(chr_go == i for i in 'AB'):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (0, 1)
+                    elif chr_go == '@' if players_hero[id_hero].chr == 'A' else '$':
+                        pass # Слав тут нужно включить замок, тут игрок около него
 
             if not preparation_window[0]:
                 for button in buttons:
@@ -725,7 +732,6 @@ def game_world_draw(*args):
                 elif e.button == buttons[2] and not preparation_window[0]:
                     switch_scene(basic_menu_draw)
                     running = False
-                    load_db()
                 elif e.button == buttons[3] and not preparation_window[0]:
                     switch_scene(castle_draw)
                     running = False
@@ -1015,10 +1021,12 @@ def result_window(*args):
                     screen.blit(text_surface, (int(size[0] * (x + 2) / 100), int(size[1] * (y + 5) / 100)))
         button.draw(screen)
         pygame.display.flip()
-    load_db()
 
 
 def castle_draw(*args):
+    size = [3840, 2160]
+    global screen
+    screen = pygame.display.set_mode(size)
     arg = list(args[0])
     flag_player = arg[10]
     if flag_player:

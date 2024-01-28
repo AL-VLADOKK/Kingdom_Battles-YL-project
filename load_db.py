@@ -66,4 +66,3 @@ def return_to_original_db():
     cur.close()
 
 
-return_to_original_db()
