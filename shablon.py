@@ -123,7 +123,7 @@ class Hero:
 
     def add_artefats(self, chr_artefact):
         cur = self.con.cursor()
-        result = cur.execute("""SELECT name, trait, value FROM artifacts """, (self.id,)).fetchall()
+        result = cur.execute("""SELECT name, trait, value FROM artifacts""").fetchall()
         if chr_artefact == '3':  # молот
             if not self.slot_2:
                 self.slot_2 = result[2]
@@ -137,9 +137,9 @@ class Hero:
                 self.slot_4 = result[4]
                 self.luck += result[4][2]
         elif chr_artefact == '1':  # свиток урона
-            if self.slot_1[0] == 'Свиток урона':
+            if self.slot_1 == 'Свиток урона':
                 pass
-            elif self.slot_1[0] == 'Свиток защиты':
+            elif self.slot_1 == 'Свиток защиты':
                 self.slot_1 = result[0]
                 self.attack += result[0][2]
                 self.protection -= result[1][2]
@@ -147,11 +147,11 @@ class Hero:
                 self.slot_1 = result[0]
                 self.attack += result[0][2]
         elif chr_artefact == '2':  # свиток защиты
-            if self.slot_1[0] == 'Свиток урона':
+            if self.slot_1 == 'Свиток урона':
                 self.slot_1 = result[1]
                 self.attack -= result[0][2]
                 self.protection += result[1][2]
-            elif self.slot_1[0] == 'Свиток защиты':
+            elif self.slot_1 == 'Свиток защиты':
                 pass
             else:
                 self.slot_1 = result[1]

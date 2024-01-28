@@ -1,7 +1,7 @@
 import sqlite3, os
 
 
-def load_db():
+def return_to_original_db():
     db = "GameDB.db3"
     db = os.path.join('data/db', db)
     con = sqlite3.connect(db)
@@ -22,7 +22,7 @@ def load_db():
         resource = cur.execute("""SELECT name FROM resources WHERE id = ?""", (i + 1,)).fetchone()
         resource_name.append(resource)
     list_l = ['lvl', 'horse_stable', 'marketplace', 'militia', 'pennies', 'swordmans', 'knights', 'archer',
-              'crossbowman', 'cleric', 'abbot', 'angel', 'horseman']
+              'crossbowman', 'cleric', 'abbot', 'master_of_light_and_might', 'horseman']
 
     for i in range(len(unit_name)):
         a = original_user_army[0][i + 2]
@@ -64,3 +64,6 @@ def load_db():
                  original_hero[0][10],))
     con.commit()
     cur.close()
+
+
+return_to_original_db()

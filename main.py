@@ -1,4 +1,5 @@
 from menu_start import BasicMenu
+from load_db import return_to_original_db
 from func_load_image import load_image
 from buton import ImageButton
 from shablon import Hero, AnimatedSprite
@@ -296,6 +297,8 @@ def game_world_draw(*args):
     size = [1920, 1080]
     res = [480, 260]
 
+    return_to_original_db()
+
     cam_x, cam_y = (0, 0) if not flag_data else args[1]
     global screen
     screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
@@ -455,12 +458,12 @@ def game_world_draw(*args):
         steps_current_hero -= 1
         if not chr_to_replace:
             map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x], \
-            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
-                map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x]
+                    map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x]
         else:
             map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x], \
-            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], chr_to_replace
         players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero + direction_y,
                                               players_hero[id_hero].x_hero + direction_x)
@@ -636,7 +639,7 @@ def game_world_draw(*args):
                                                                         neutral_in_arms(neutral_dict[(
                                                                             players_hero[id_hero].y_hero,
                                                                             players_hero[id_hero].x_hero - 1)])), (
-                                             0, -1)
+                            0, -1)
                     elif any(chr_go == i for i in 'AB'):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (0, -1)
@@ -731,7 +734,7 @@ def game_world_draw(*args):
                             players_hero[id_hero].load_db()
                             map[players_hero[id_hero].y_hero + preparation_window[2][0]][
                                 players_hero[id_hero].x_hero + preparation_window[2][1]], \
-                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], '-'
                             players_hero[id_hero].set_hero_coords(
                                 players_hero[id_hero].y_hero + preparation_window[2][0],
