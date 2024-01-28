@@ -1,6 +1,7 @@
 from menu_start import BasicMenu
 from load_db import return_to_original_db
 from func_load_image import load_image
+from load_db import load_db
 from buton import ImageButton
 from shablon import Hero, AnimatedSprite
 from fog_war import create_fog_war, change_fog_war
@@ -522,29 +523,35 @@ def game_world_draw(*args):
                         map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
                                                                                      current_fog, cam_y, cam_x, -1, 0,
                                                                                      chr_to_replace='-')
+                        players_hero[id_hero].load_db()
                     elif chr_go == 'W':
                         players_hero[id_hero].wood += random.randrange(1, 4)
                         map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
                                                                                      current_fog, cam_y, cam_x, -1, 0,
                                                                                      chr_to_replace='-')
+                        players_hero[id_hero].load_db()
                     elif chr_go == 'R':
                         players_hero[id_hero].rock += random.randrange(1, 4)
                         map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
                                                                                      current_fog, cam_y, cam_x, -1, 0,
                                                                                      chr_to_replace='-')
+                        players_hero[id_hero].load_db()
                     elif chr_go == 'M':
                         players_hero[id_hero].cristal += random.randrange(1, 3)
                         map, steps_current_hero, current_fog, cam_y, cam_x = go_hero(map, steps_current_hero,
                                                                                      current_fog, cam_y, cam_x, -1, 0,
                                                                                      chr_to_replace='-')
+                        players_hero[id_hero].load_db()
                     elif any(chr_go == i for i in 'OKIF'):
                         steps_current_hero, players_hero[id_hero] = list(visit_the_building(steps_current_hero, -1, 0,
                                                                                             chr_go,
                                                                                             players_hero[id_hero]))
+                        players_hero[id_hero].load_db()
                     elif any(chr_go == i for i in '12345'):
                         map, steps_current_hero, current_fog, cam_y, cam_x, players_hero[id_hero] = take_the_artifact(
                             map, steps_current_hero, current_fog, cam_y, cam_x, -1, 0, players_hero[id_hero], chr_go,
                             chr_to_replace='-')
+                        players_hero[id_hero].load_db()
                     elif chr_go == 'V':
                         preparation_window = 1, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         neutral_in_arms(neutral_dict[(
@@ -718,6 +725,7 @@ def game_world_draw(*args):
                 elif e.button == buttons[2] and not preparation_window[0]:
                     switch_scene(basic_menu_draw)
                     running = False
+                    load_db()
                 elif e.button == buttons[3] and not preparation_window[0]:
                     switch_scene(castle_draw)
                     running = False
@@ -890,13 +898,13 @@ def hero_characteristics(*args):
                     pygame.transform.scale(m_arm,
                                            (int(size[0] * 0.05), int(size[0] * 0.05))),
                     (int(size[0] * x // 100), int(size[1] * y // 100)))
-                if army[i * ii - 1]:
+                if type(army[ii + ((i - 1) * 3) - 1]) != bool:
                     screen.blit(
-                        pygame.transform.scale(d[army[i * ii - 1][0].name],
+                        pygame.transform.scale(d[army[ii + ((i - 1) * 3) - 1][0].name],
                                                (int(size[0] * 0.05 * 0.95), int(size[0] * 0.05 * 0.95))),
                         (int(size[0] * (x / 100)), int(size[1] * (y / 100))))
                     font = pygame.font.Font(None, 50)
-                    text_surface = font.render(str(army[i * ii - 1][1]), True, (218, 165, 32))
+                    text_surface = font.render(str(army[ii + ((i - 1) * 3) - 1][1]), True, (218, 165, 32))
                     screen.blit(text_surface, (int(size[0] * (x + 2) / 100), int(size[1] * (y + 5) / 100)))
 
         button.draw(screen)
@@ -1007,6 +1015,7 @@ def result_window(*args):
                     screen.blit(text_surface, (int(size[0] * (x + 2) / 100), int(size[1] * (y + 5) / 100)))
         button.draw(screen)
         pygame.display.flip()
+    load_db()
 
 
 def castle_draw(*args):

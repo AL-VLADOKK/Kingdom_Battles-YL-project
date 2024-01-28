@@ -64,7 +64,7 @@ def draw_preparation_window(army1, army2):
          'cleric': load_image('clerick_ikonka.png'),
          'abbot': load_image('abbot_ikonka.png'),
          'horseman': load_image('vsadnik_ikonka.png'),
-         'master of light and might': load_image('angel_ikonka.png')}
+         'master_of_light_and_might': load_image('angel_ikonka.png')}
     board_img = load_image('board.png', colorkey=-1)
     rect = board_img.get_rect()
     for i in range(5, 86, 72):
