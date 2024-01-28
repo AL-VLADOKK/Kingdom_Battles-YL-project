@@ -59,45 +59,12 @@ def switch_scene(scene):
     current_scene = scene
 
 
-def setting_screen():
-    menu = BasicMenu()
-    menu.append_option('Играть', lambda: switch_scene(game_world_draw))
-    menu.append_option('Выбрать размер', lambda: quit)
-    menu.append_option('Вернуться', lambda: switch_scene(basic_menu_draw))
-    running = True
-    screen.blit(load_image(image), (0, 0))
-    menu.draw(screen, 800, 400, 75)
-    while running:
-        for e in pygame.event.get():
-            if e.type == pygame.MOUSEBUTTONDOWN:
-                running = False
-                menu.click(e.pos)
-            if e.type == pygame.QUIT:
-                running = False
-                switch_scene(None)
-            elif e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_ESCAPE:
-                    running = False
-                    switch_scene(None)
-                elif e.key == pygame.K_w:
-                    menu.switch(-1)
-                elif e.key == pygame.K_s:
-                    menu.switch(1)
-                elif e.key == pygame.K_SPACE:
-                    menu.select()
-                    running = False
-        screen.blit(load_image(image), (0, 0))
-        menu.draw(screen, 800, 400, 75)
-        pygame.display.flip()
-
-
 def basic_menu_draw(*args):
     global screen
     size = 1920, 1080
     screen = pygame.display.set_mode(size)
     menu = BasicMenu()
     menu.append_option('      1 VS 1      ', lambda: switch_scene(menu_draw))
-    menu.append_option('Размер экрана', lambda: switch_scene(setting_screen))
     menu.append_option('      Выйти      ', quit)
     running = True
     screen.blit(load_image(image), (0, 0))
@@ -458,12 +425,12 @@ def game_world_draw(*args):
         steps_current_hero -= 1
         if not chr_to_replace:
             map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x], \
-                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
-                    map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x]
+                map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x]
         else:
             map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x], \
-                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], chr_to_replace
         players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero + direction_y,
                                               players_hero[id_hero].x_hero + direction_x)
@@ -560,7 +527,7 @@ def game_world_draw(*args):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (-1, 0)
                     elif chr_go == '@' if players_hero[id_hero].chr == 'A' else '$':
-                        pass # Слав тут нужно включить замок, тут игрок около него
+                        pass  # Слав тут нужно включить замок, тут игрок около него
                 elif (e.key == pygame.K_DOWN or e.key == pygame.K_KP2) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero]
                     if chr_go == '-':
@@ -604,7 +571,7 @@ def game_world_draw(*args):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (1, 0)
                     elif chr_go == '@' if players_hero[id_hero].chr == 'A' else '$':
-                        pass # Слав тут нужно включить замок, тут игрок около него
+                        pass  # Слав тут нужно включить замок, тут игрок около него
                 elif (e.key == pygame.K_LEFT or e.key == pygame.K_KP4) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
                     if chr_go == '-':
@@ -649,12 +616,12 @@ def game_world_draw(*args):
                                                                         neutral_in_arms(neutral_dict[(
                                                                             players_hero[id_hero].y_hero,
                                                                             players_hero[id_hero].x_hero - 1)])), (
-                            0, -1)
+                                                 0, -1)
                     elif any(chr_go == i for i in 'AB'):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (0, -1)
                     elif chr_go == '@' if players_hero[id_hero].chr == 'A' else '$':
-                        pass # Слав тут нужно включить замок, тут игрок около него
+                        pass  # Слав тут нужно включить замок, тут игрок около него
                 elif (e.key == pygame.K_RIGHT or e.key == pygame.K_KP6) and steps_current_hero:
 
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1]
@@ -698,7 +665,7 @@ def game_world_draw(*args):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (0, 1)
                     elif chr_go == '@' if players_hero[id_hero].chr == 'A' else '$':
-                        pass # Слав тут нужно включить замок, тут игрок около него
+                        pass  # Слав тут нужно включить замок, тут игрок около него
 
             if not preparation_window[0]:
                 for button in buttons:
@@ -748,7 +715,7 @@ def game_world_draw(*args):
                             players_hero[id_hero].load_db()
                             map[players_hero[id_hero].y_hero + preparation_window[2][0]][
                                 players_hero[id_hero].x_hero + preparation_window[2][1]], \
-                                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], '-'
                             players_hero[id_hero].set_hero_coords(
                                 players_hero[id_hero].y_hero + preparation_window[2][0],
