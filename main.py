@@ -7,11 +7,13 @@ from fog_war import create_fog_war, change_fog_war
 from on_screen import chunks_on_screen, resources_on_screen
 from neutral import create_dict_neutral, draw_preparation_window, neutral_in_arms, battle_enemis_scoring, \
     battle_enemis_hero_scoring
-from buildings import RedCastle, BlueCastle
+from buildings import Buildings, RedCastle, BlueCastle
 import pygame  # импорт библиотеки PyGame
 import random
 import sqlite3
 import os
+
+return_to_original_db()
 
 pygame.init()  # инициализируем PyGame
 
@@ -91,16 +93,16 @@ def basic_menu_draw(*args):
         screen.blit(load_image(image), (0, 0))
         menu.draw(screen, 800, 400, 75)
         pygame.display.flip()
-    return args
 
 
 def menu_draw(*args):
     size = 1920, 1080
     global screen
+    global data_game
     screen = pygame.display.set_mode(size)
     menu = BasicMenu()
     menu.append_option('Играть', lambda: switch_scene(game_world_draw))
-    menu.append_option('Выбрать карту', lambda: switch_scene(select_map_1()))
+    menu.append_option('Выбрать карту', lambda: switch_scene(select_map_1))
     menu.append_option('Вернуться', lambda: switch_scene(basic_menu_draw))
     running = True
     screen.blit(load_image(image), (0, 0))
@@ -109,7 +111,13 @@ def menu_draw(*args):
         for e in pygame.event.get():
             if e.type == pygame.MOUSEBUTTONDOWN:
                 running = False
-                menu.click(e.pos)
+                if menu.return_click(e.pos) == 0:
+                    switch_scene(game_world_draw)
+                    a = data_game
+                    while current_scene is not None:
+                        data_game = current_scene(data_game)
+                else:
+                    menu.click(e.pos)
             if e.type == pygame.QUIT:
                 running = False
                 switch_scene(None)
@@ -122,17 +130,24 @@ def menu_draw(*args):
                 elif e.key == pygame.K_s:
                     menu.switch(1)
                 elif e.key == pygame.K_SPACE:
-                    menu.select()
                     running = False
+                    if menu.return_index() == 0:
+                        switch_scene(game_world_draw)
+                        a = data_game
+                        while current_scene is not None:
+                            data_game = current_scene(data_game)
+                    else:
+                        menu.select()
+
         screen.blit(load_image(image), (0, 0))
         menu.draw(screen, 800, 400, 75)
         pygame.display.flip()
-    return args
 
 
 def select_map_1(*args):
     size = 1920, 1080
     global screen
+    global data_game
     screen = pygame.display.set_mode(size)
     menu = BasicMenu()
 
@@ -140,10 +155,10 @@ def select_map_1(*args):
     db = os.path.join('data/db', db)
     con = sqlite3.connect(db)
     cur = con.cursor()
-    result = cur.execute("""SELECT name, description, link FROM maps WHERE id = 1""").fetchall()
+    result = cur.execute("""SELECT name, description, link FROM maps""").fetchall()
 
     menu.append_option(f'{result[0][0]}', lambda: switch_scene(select_map_1))
-    menu.append_option('...', lambda: switch_scene(select_map_2))
+    menu.append_option(f'{result[1][0]}', lambda: switch_scene(select_map_2))
     menu.append_option('Вернуться', lambda: switch_scene(menu_draw))
 
     description_text = result[0][1].split('\\n')
@@ -153,12 +168,12 @@ def select_map_1(*args):
     running = True
     screen.blit(load_image(image), (0, 0))
     menu.draw(screen, 400, 400, 75)
-    buttons = [ImageButton(920, 625, 1000, 350, '', 'scroll.png',
-                           hover_image_path='scroll.png'),
-               ImageButton(375, 800, 300, 200, 'ВЫБРАТЬ',
-                           '—Pngtree—buttons games button illustration_5544907.png',
-                           hover_image_path='—Pngtree—buttons games button illustration_5544907_2.png')
-               ]
+    buttons_1 = [ImageButton(920, 625, 1000, 350, '', 'scroll.png',
+                             hover_image_path='scroll.png'),
+                 ImageButton(375, 800, 300, 200, 'ВЫБРАТЬ',
+                             '—Pngtree—buttons games button illustration_5544907.png',
+                             hover_image_path='—Pngtree—buttons games button illustration_5544907_2.png')
+                 ]
     while running:
         for e in pygame.event.get():
             if e.type == pygame.MOUSEBUTTONDOWN:
@@ -178,37 +193,39 @@ def select_map_1(*args):
                 elif e.key == pygame.K_SPACE:
                     menu.select()
                     running = False
-            for button in buttons:
+            for button in buttons_1:
                 button.handle_event(e)
             if e.type == pygame.USEREVENT:
-                if e.button == buttons[1]:
-                    data_game = f'data/maps/{selected_map}'
+                b = e.button_1
+                a = buttons_1.index(e.button_1)
+                if e.button == buttons_1[1]:
+                    data_game = 'data/maps/map_1.txt',
+                    a = data_game
         screen.blit(load_image(image), (0, 0))
-        for button in buttons:
+        for button in buttons_1:
             button.check_hover(pygame.mouse.get_pos())
             button.draw(screen)
         screen.blit(description_1, (1100, 700))
         screen.blit(description_2, (1100, 800))
         menu.draw(screen, 400, 400, 75)
         pygame.display.flip()
-    print(data_game)
-    return data_game
 
 
 def select_map_2(*args):
     size = 1920, 1080
     global screen
+    global data_game
 
     db = "GameDB.db3"
     db = os.path.join('data/db', db)
     con = sqlite3.connect(db)
     cur = con.cursor()
-    result = cur.execute("""SELECT name, description, link FROM maps WHERE id = 2""").fetchall()
+    result = cur.execute("""SELECT name, description, link FROM maps""").fetchall()
 
     screen = pygame.display.set_mode(size)
     menu = BasicMenu()
     menu.append_option(f'{result[0][0]}', lambda: switch_scene(select_map_1))
-    menu.append_option(f'{result[0][1]}', lambda: switch_scene(select_map_2))
+    menu.append_option(f'{result[1][0]}', lambda: switch_scene(select_map_2))
     menu.append_option('Вернуться', lambda: switch_scene(menu_draw))
 
     description_text = result[1][1].split('\\n')
@@ -218,12 +235,12 @@ def select_map_2(*args):
     running = True
     screen.blit(load_image(image), (0, 0))
     menu.draw(screen, 400, 400, 75)
-    buttons = [ImageButton(920, 625, 1000, 350, '', 'scroll.png',
-                           hover_image_path='scroll.png'),
-               ImageButton(375, 800, 300, 200, 'ВЫБРАТЬ',
-                           '—Pngtree—buttons games button illustration_5544907.png',
-                           hover_image_path='—Pngtree—buttons games button illustration_5544907_2.png')
-               ]
+    buttons_2 = [ImageButton(920, 625, 1000, 350, '', 'scroll.png',
+                             hover_image_path='scroll.png'),
+                 ImageButton(375, 800, 300, 200, 'ВЫБРАТЬ ',
+                             '—Pngtree—buttons games button illustration_5544907.png',
+                             hover_image_path='—Pngtree—buttons games button illustration_5544907_2.png')
+                 ]
     while running:
         for e in pygame.event.get():
             if e.type == pygame.MOUSEBUTTONDOWN:
@@ -243,21 +260,22 @@ def select_map_2(*args):
                 elif e.key == pygame.K_SPACE:
                     menu.select()
                     running = False
-            for button in buttons:
+            for button in buttons_2:
                 button.handle_event(e)
             if e.type == pygame.USEREVENT:
-                if e.button == buttons[1]:
-                    data_game = f'data/maps/{selected_map}'
+                b = e.button
+                a = buttons_2.index(e.button)
+                if e.button == buttons_2[1]:
+                    data_game = ('data/maps/map_2.txt',)
+                    a = data_game
         screen.blit(load_image(image), (0, 0))
-        for button in buttons:
+        for button in buttons_2:
             button.check_hover(pygame.mouse.get_pos())
             button.draw(screen)
         screen.blit(description_1, (1100, 700))
         screen.blit(description_2, (1100, 800))
         menu.draw(screen, 400, 400, 75)
         pygame.display.flip()
-    print(data_game)
-    return data_game
 
 
 def game_world_draw(*args):
@@ -267,8 +285,6 @@ def game_world_draw(*args):
 
     size = [1920, 1080]
     res = [480, 260]
-
-    return_to_original_db()
 
     cam_x, cam_y = (0, 0) if not flag_data else args[1]
     global screen
@@ -429,12 +445,12 @@ def game_world_draw(*args):
         steps_current_hero -= 1
         if not chr_to_replace:
             map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x], \
-            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], \
-                map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x]
+                    map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x]
         else:
             map[players_hero[id_hero].y_hero + direction_y][players_hero[id_hero].x_hero + direction_x], \
-            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], chr_to_replace
         players_hero[id_hero].set_hero_coords(players_hero[id_hero].y_hero + direction_y,
                                               players_hero[id_hero].x_hero + direction_x)
@@ -620,7 +636,7 @@ def game_world_draw(*args):
                                                                         neutral_in_arms(neutral_dict[(
                                                                             players_hero[id_hero].y_hero,
                                                                             players_hero[id_hero].x_hero - 1)])), (
-                                                 0, -1)
+                            0, -1)
                     elif any(chr_go == i for i in 'AB'):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (0, -1)
@@ -719,7 +735,7 @@ def game_world_draw(*args):
                             players_hero[id_hero].load_db()
                             map[players_hero[id_hero].y_hero + preparation_window[2][0]][
                                 players_hero[id_hero].x_hero + preparation_window[2][1]], \
-                            map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
+                                map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero] = \
                                 map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero], '-'
                             players_hero[id_hero].set_hero_coords(
                                 players_hero[id_hero].y_hero + preparation_window[2][0],
@@ -1000,6 +1016,7 @@ def castle_draw(*args):
     screen = pygame.display.set_mode(size)
     arg = list(args[0])
     flag_player = arg[10]
+    player = arg[11]
     if flag_player:
         user_id = 2
     else:
@@ -1016,7 +1033,6 @@ def castle_draw(*args):
               'crossbowman', 'cleric', 'abbot', 'master_of_light_and_might', 'horseman']
 
     def load_data():
-        global castle_buying_id, castle_army_id
         if user_id == 2:
             castle_buying_id = 7
             castle_army_id = 4
@@ -1026,55 +1042,57 @@ def castle_draw(*args):
 
         cur = con.cursor()
         units = cur.execute("""SELECT unit_name FROM units """).fetchall()
-        buying_values = []
-        army_values = []
+        buying_values = {}
+        army_values = {}
         for i in units:
             unit = i[0]
             buying = cur.execute(f"""SELECT {unit} FROM army WHERE id = {castle_buying_id}""").fetchone()
             army = cur.execute(f"""SELECT {unit} FROM army WHERE id = {castle_army_id}""").fetchone()
-            buying_values.append(buying[0])
-            army_values.append(army[0])
+            buying_values[unit] = buying[0]
+            army_values[unit] = army[0]
 
-        values = [[pygame.font.SysFont('arial', 30).render(f'{buying_values[0]}', True, (255, 255, 255)),
+        name = ['peasant', 'penny', 'swordman', 'knight', 'archer', 'crossbowman', 'cleric', 'abbot',
+                'master_of_light_and_might', 'horseman']
+        values = [[pygame.font.SysFont('arial', 30).render(f'{army_values[name[0]]}', True, (255, 255, 255)),
                    (1343, 180)],
-                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[1]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[name[1]]}', True, (255, 255, 255)),
                    (1493, 180)],
-                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[2]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[name[2]]}', True, (255, 255, 255)),
                    (1343, 380)],
-                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[3]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[name[3]]}', True, (255, 255, 255)),
                    (1493, 380)],
-                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[4]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[name[4]]}', True, (255, 255, 255)),
                    (1343, 580)],
-                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[5]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[name[5]]}', True, (255, 255, 255)),
                    (1493, 580)],
-                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[6]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[name[6]]}', True, (255, 255, 255)),
                    (1343, 780)],
-                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[7]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[name[7]]}', True, (255, 255, 255)),
                    (1493, 780)],
-                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[8]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[name[8]]}', True, (255, 255, 255)),
                    (1343, 980)],
-                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[9]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{army_values[name[9]]}', True, (255, 255, 255)),
                    (1493, 980)],
 
-                  [pygame.font.SysFont('arial', 30).render(f'{army_values[0]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[name[0]]}', True, (255, 255, 255)),
                    (1688, 180)],
-                  [pygame.font.SysFont('arial', 30).render(f'{army_values[1]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[name[1]]}', True, (255, 255, 255)),
                    (1838, 180)],
-                  [pygame.font.SysFont('arial', 30).render(f'{army_values[2]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[name[2]]}', True, (255, 255, 255)),
                    (1688, 380)],
-                  [pygame.font.SysFont('arial', 30).render(f'{army_values[3]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[name[3]]}', True, (255, 255, 255)),
                    (1838, 380)],
-                  [pygame.font.SysFont('arial', 30).render(f'{army_values[4]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[name[4]]}', True, (255, 255, 255)),
                    (1688, 580)],
-                  [pygame.font.SysFont('arial', 30).render(f'{army_values[5]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[name[5]]}', True, (255, 255, 255)),
                    (1838, 580)],
-                  [pygame.font.SysFont('arial', 30).render(f'{army_values[6]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[name[6]]}', True, (255, 255, 255)),
                    (1688, 780)],
-                  [pygame.font.SysFont('arial', 30).render(f'{army_values[7]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[name[7]]}', True, (255, 255, 255)),
                    (1838, 780)],
-                  [pygame.font.SysFont('arial', 30).render(f'{army_values[8]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[name[8]]}', True, (255, 255, 255)),
                    (1688, 980)],
-                  [pygame.font.SysFont('arial', 30).render(f'{army_values[9]}', True, (255, 255, 255)),
+                  [pygame.font.SysFont('arial', 30).render(f'{buying_values[name[9]]}', True, (255, 255, 255)),
                    (1838, 980)]
                   ]
         return values
@@ -1136,8 +1154,8 @@ def castle_draw(*args):
 
                ImageButton(220, 210, 200, 200, '', 'spear_ikonka.png',
                            hover_image_path='spear_ikonka.png'),
-               ImageButton(220, 420, 200, 200, '', 'knight_buying_ikonka.jpg',
-                           hover_image_path='knight_buying_ikonka.jpg'),
+               ImageButton(220, 420, 200, 200, '', 'knight_buying_ikonka.png',
+                           hover_image_path='knight_buying_ikonka.png'),
                ImageButton(530, 210, 200, 200, '', 'marketplace_ikonka.png',
                            hover_image_path='marketplace_ikonka.png'),
                ImageButton(840, 210, 200, 200, '', 'luk_ikonka.png',
@@ -1184,6 +1202,9 @@ def castle_draw(*args):
         pygame.draw.rect(screen, (255, 191, 26), (0, 410, 1260, 10))
         pygame.draw.rect(screen, (255, 191, 26), (0, 620, 1260, 10))
         pygame.draw.rect(screen, (255, 191, 26), (0, 830, 1260, 10))
+        pygame.draw.rect(screen, (187,137,147), (0, 210, 1240, 200))
+        pygame.draw.rect(screen, (161, 161, 161), (0, 420, 1240, 200))
+        pygame.draw.rect(screen, (187, 137, 147), (0, 630, 1240, 200))
         for text_massage in text:
             screen.blit(text_massage[0], text_massage[1])
         for value in value_text:
@@ -1205,6 +1226,8 @@ def castle_draw(*args):
                     elif user_id == 3:
                         b = BlueCastle()
                         b.add_army_to_hero('peasant')
+                    value_text = load_data()
+                    player[user_id - 2].load_db()
                 elif e.button == buttons[1] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1212,6 +1235,8 @@ def castle_draw(*args):
                     elif user_id == 3:
                         b = BlueCastle()
                         b.add_army_to_hero('penny')
+                    value_text = load_data()
+                    player[user_id].load_db()
                 elif e.button == buttons[2] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1219,6 +1244,8 @@ def castle_draw(*args):
                     elif user_id == 3:
                         b = BlueCastle()
                         b.add_army_to_hero('swordman')
+                    value_text = load_data()
+                    player[user_id].load_db()
                 elif e.button == buttons[3] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1226,6 +1253,8 @@ def castle_draw(*args):
                     elif user_id == 3:
                         b = BlueCastle()
                         b.add_army_to_hero('knight')
+                    value_text = load_data()
+                    player[user_id].load_db()
                 elif e.button == buttons[4] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1233,6 +1262,8 @@ def castle_draw(*args):
                     elif user_id == 3:
                         b = BlueCastle()
                         b.add_army_to_hero('archer')
+                    value_text = load_data()
+                    player[user_id].load_db()
                 elif e.button == buttons[5] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1240,6 +1271,8 @@ def castle_draw(*args):
                     elif user_id == 3:
                         b = BlueCastle()
                         b.add_army_to_hero('crossbowman')
+                    value_text = load_data()
+                    player[user_id].load_db()
                 elif e.button == buttons[6] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1247,6 +1280,8 @@ def castle_draw(*args):
                     elif user_id == 3:
                         b = BlueCastle()
                         b.add_army_to_hero('cleric')
+                    value_text = load_data()
+                    player[user_id].load_db()
                 elif e.button == buttons[7] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1254,6 +1289,8 @@ def castle_draw(*args):
                     elif user_id == 3:
                         b = BlueCastle()
                         b.add_army_to_hero('abbot')
+                    value_text = load_data()
+                    player[user_id].load_db()
                 elif e.button == buttons[8] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1261,6 +1298,8 @@ def castle_draw(*args):
                     elif user_id == 3:
                         b = BlueCastle()
                         b.add_army_to_hero('master_of_light_and_might')
+                    value_text = load_data()
+                    player[user_id].load_db()
                 elif e.button == buttons[9] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1268,6 +1307,8 @@ def castle_draw(*args):
                     elif user_id == 3:
                         b = BlueCastle()
                         b.add_army_to_hero('horseman')
+                    value_text = load_data()
+                    player[user_id].load_db()
 
                 elif e.button == buttons[10]:
                     chosen_unit = 'peasant'
@@ -1325,42 +1366,37 @@ def castle_draw(*args):
                         if user_id == 2:
                             r = RedCastle()
                             r.buy_army(chosen_unit)
-                            load_data()
                         elif user_id == 3:
                             b = BlueCastle()
                             b.buy_army(chosen_unit)
-                            load_data()
-                        can_add_new_building = False
+                        value_text = load_data()
                     elif chosen_unit == '' and (chosen_building != '' and chosen_building != 'lvl2'
                                                 and chosen_building != 'lvl3') and can_add_new_building:
                         if user_id == 2:
                             r = RedCastle()
                             r.new_building(chosen_building)
-                            load_building()
                         elif user_id == 3:
                             b = BlueCastle()
                             b.new_building(chosen_building)
-                            load_building()
+                        building_value = load_building()
                         can_add_new_building = False
                     elif chosen_unit == '' and chosen_building == 'lvl2':
                         if user_id == 2:
                             r = RedCastle()
                             r.update_castle()
-                            load_building()
                         elif user_id == 3:
                             b = BlueCastle()
                             b.update_castle()
-                            load_building()
+                        building_value = load_building()
                         can_add_new_building = False
                     elif chosen_unit == '' and chosen_building == 'lvl3':
                         if user_id == 2:
                             r = RedCastle()
                             r.update_castle()
-                            load_building()
                         elif user_id == 3:
                             b = BlueCastle()
                             b.update_castle()
-                            load_building()
+                        building_value = load_building()
                         can_add_new_building = False
 
                 elif e.button == buttons[21]:
@@ -1447,7 +1483,8 @@ def castle_draw(*args):
                 t_1 = pygame.font.SysFont('arial', 45).render(description_2, True, (255, 255, 255))
                 screen.blit(t, (20, 850))
                 screen.blit(t_1, (20, 900))
-            elif chosen_unit == '' and chosen_building != '' and building_value['lvl'] == 1:
+            elif (chosen_unit == '' and chosen_building != '' and building_value['lvl'] == 1 and (
+                    building_value[chosen_building] == 'no')):
                 price = cur.execute("""SELECT gold, wood, rock, magic_cristalls FROM castle_units 
                                                     WHERE name = ?""", (chosen_building,)).fetchone()
                 description_1 = f'{chosen_building_rus}: стоимость - {price[0]} золота,'
