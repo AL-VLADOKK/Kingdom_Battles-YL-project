@@ -61,6 +61,9 @@ class Hero:
 
         cur = self.con.cursor()
         result = cur.execute("""SELECT * FROM heroes WHERE id = ?""", (self.id,)).fetchone()
+        hor = cur.execute("""SELECT horse_stable FROM castles WHERE id = ?""", (self.id,)).fetchone()
+        if hor[0] == 'yes':
+            self.aurs_stable_hors = 7
         self.name = result[1]
         self.chr = 'A' if self.name == 'red_hero' else 'B'
         self.steps = result[2]
@@ -105,6 +108,9 @@ class Hero:
         cur.execute("""UPDATE user_resources SET gold = ?, wood = ?, rock = ?, magic_crystal = ? WHERE id = ?""",
                     (self.gold, self.wood, self.rock, self.cristal, self.id))
         self.con.commit()
+        hor = cur.execute("""SELECT horse_stable FROM castles WHERE id = ?""", (self.id,)).fetchone()
+        if hor[0] == 'yes':
+            self.aurs_stable_hors = 7
         arm = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         for i in self.slots_army:
             if type(i) != bool:

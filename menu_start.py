@@ -22,6 +22,9 @@ class Menu:
     def select(self):  # вызов функции
         self.defs[self.index]()
 
+    def return_index(self):
+        return self.index
+
     def draw(self, surf, x, y, padding):
         for i, option in enumerate(self.option_surface):
             option_rect = option.get_rect()
@@ -38,6 +41,11 @@ class Menu:
                 self.select()
                 break
 
+    def return_click(self, coords):
+        for option_rect in self.coords_options_surface:
+            if option_rect.collidepoint(coords):
+                self.index = self.coords_options_surface.index(option_rect)
+                return self.index
 
 class BasicMenu(Menu):
     link_image = 'scroll.png'
