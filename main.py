@@ -7,7 +7,7 @@ from fog_war import create_fog_war, change_fog_war
 from on_screen import chunks_on_screen, resources_on_screen
 from neutral import create_dict_neutral, draw_preparation_window, neutral_in_arms, battle_enemis_scoring, \
     battle_enemis_hero_scoring
-from buildings import Buildings, RedCastle, BlueCastle
+from buildings import RedCastle, BlueCastle
 import pygame  # импорт библиотеки PyGame
 import random
 import sqlite3
@@ -91,6 +91,7 @@ def basic_menu_draw(*args):
         screen.blit(load_image(image), (0, 0))
         menu.draw(screen, 800, 400, 75)
         pygame.display.flip()
+    return args
 
 
 def menu_draw(*args):
@@ -126,12 +127,12 @@ def menu_draw(*args):
         screen.blit(load_image(image), (0, 0))
         menu.draw(screen, 800, 400, 75)
         pygame.display.flip()
+    return args
 
 
-def select_map_1():
+def select_map_1(*args):
     size = 1920, 1080
     global screen
-    global data_game
     screen = pygame.display.set_mode(size)
     menu = BasicMenu()
 
@@ -190,12 +191,13 @@ def select_map_1():
         screen.blit(description_2, (1100, 800))
         menu.draw(screen, 400, 400, 75)
         pygame.display.flip()
+    print(data_game)
+    return data_game
 
 
-def select_map_2():
+def select_map_2(*args):
     size = 1920, 1080
     global screen
-    global data_game
 
     db = "GameDB.db3"
     db = os.path.join('data/db', db)
@@ -254,6 +256,8 @@ def select_map_2():
         screen.blit(description_2, (1100, 800))
         menu.draw(screen, 400, 400, 75)
         pygame.display.flip()
+    print(data_game)
+    return data_game
 
 
 def game_world_draw(*args):
@@ -1012,6 +1016,7 @@ def castle_draw(*args):
               'crossbowman', 'cleric', 'abbot', 'master_of_light_and_might', 'horseman']
 
     def load_data():
+        global castle_buying_id, castle_army_id
         if user_id == 2:
             castle_buying_id = 7
             castle_army_id = 4
