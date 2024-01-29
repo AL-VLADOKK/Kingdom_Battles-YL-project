@@ -144,7 +144,7 @@ def menu_draw(*args):
         pygame.display.flip()
 
 
-def select_map_1(*args):
+def select_map_1():
     size = 1920, 1080
     global screen
     global data_game
@@ -211,7 +211,7 @@ def select_map_1(*args):
         pygame.display.flip()
 
 
-def select_map_2(*args):
+def select_map_2():
     size = 1920, 1080
     global screen
     global data_game
