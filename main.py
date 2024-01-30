@@ -1227,7 +1227,7 @@ def castle_draw(*args):
                         b = BlueCastle()
                         b.add_army_to_hero('peasant')
                     value_text = load_data()
-                    player[user_id - 2].load_db()
+                    player[user_id - 2].from_db_to_hero_army()
                 elif e.button == buttons[1] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1236,7 +1236,7 @@ def castle_draw(*args):
                         b = BlueCastle()
                         b.add_army_to_hero('penny')
                     value_text = load_data()
-                    player[user_id].load_db()
+                    player[user_id].from_db_to_hero_army()
                 elif e.button == buttons[2] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1245,7 +1245,7 @@ def castle_draw(*args):
                         b = BlueCastle()
                         b.add_army_to_hero('swordman')
                     value_text = load_data()
-                    player[user_id].load_db()
+                    player[user_id].from_db_to_hero_army()
                 elif e.button == buttons[3] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1254,7 +1254,7 @@ def castle_draw(*args):
                         b = BlueCastle()
                         b.add_army_to_hero('knight')
                     value_text = load_data()
-                    player[user_id].load_db()
+                    player[user_id].from_db_to_hero_army()
                 elif e.button == buttons[4] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1263,7 +1263,7 @@ def castle_draw(*args):
                         b = BlueCastle()
                         b.add_army_to_hero('archer')
                     value_text = load_data()
-                    player[user_id].load_db()
+                    player[user_id].from_db_to_hero_army()
                 elif e.button == buttons[5] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1272,7 +1272,7 @@ def castle_draw(*args):
                         b = BlueCastle()
                         b.add_army_to_hero('crossbowman')
                     value_text = load_data()
-                    player[user_id].load_db()
+                    player[user_id].from_db_to_hero_army()
                 elif e.button == buttons[6] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1281,7 +1281,7 @@ def castle_draw(*args):
                         b = BlueCastle()
                         b.add_army_to_hero('cleric')
                     value_text = load_data()
-                    player[user_id].load_db()
+                    player[user_id].from_db_to_hero_army()
                 elif e.button == buttons[7] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1290,7 +1290,7 @@ def castle_draw(*args):
                         b = BlueCastle()
                         b.add_army_to_hero('abbot')
                     value_text = load_data()
-                    player[user_id].load_db()
+                    player[user_id].from_db_to_hero_army()
                 elif e.button == buttons[8] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1299,7 +1299,7 @@ def castle_draw(*args):
                         b = BlueCastle()
                         b.add_army_to_hero('master_of_light_and_might')
                     value_text = load_data()
-                    player[user_id].load_db()
+                    player[user_id].from_db_to_hero_army()
                 elif e.button == buttons[9] and hero_in_castle:
                     if user_id == 2:
                         r = RedCastle()
@@ -1308,7 +1308,7 @@ def castle_draw(*args):
                         b = BlueCastle()
                         b.add_army_to_hero('horseman')
                     value_text = load_data()
-                    player[user_id].load_db()
+                    player[user_id].from_db_to_hero_army()
 
                 elif e.button == buttons[10]:
                     chosen_unit = 'peasant'

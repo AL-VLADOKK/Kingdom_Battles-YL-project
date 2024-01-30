@@ -124,6 +124,21 @@ class Hero:
         self.con.commit()
         cur.close()
 
+    def from_db_to_hero_army(self):
+        cur = self.con.cursor()
+        if self.id == 2:
+            arm_id = 3
+        else:
+            arm_id = 5
+        arms = cur.execute("""SELECT peasant, penny, swordman, knight, archer, crossbowman, cleric, abbot, 
+        master_of_light_and_might, horseman FROM army WHERE id = ?""", (arm_id,)).fetchone()
+        self.slots_army = []
+        for i in range(len(arms)):
+            if arms[i] != 0:
+                self.slots_army.append([Unit(Unit.r_d[Unit.id_in_d[i]]), arms[i]])
+        for i in range(6 - len(self.slots_army)):
+            self.slots_army.append(False)
+
     def give_characteristics(self):
         return [self.attack, self.protection, self.luck, self.inspiration]
 
