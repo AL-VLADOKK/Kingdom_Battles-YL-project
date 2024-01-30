@@ -101,8 +101,8 @@ def menu_draw(*args):
     global data_game
     screen = pygame.display.set_mode(size)
     menu = BasicMenu()
-    menu.append_option('Играть', lambda: switch_scene(game_world_draw))
-    menu.append_option('Выбрать карту', lambda: switch_scene(select_map_1))
+    menu.append_option('Карта 1', lambda: switch_scene(game_world_draw))
+    menu.append_option('Тренировочная карта', lambda: switch_scene(game_world_draw))
     menu.append_option('Вернуться', lambda: switch_scene(basic_menu_draw))
     running = True
     screen.blit(load_image(image), (0, 0))
@@ -113,7 +113,12 @@ def menu_draw(*args):
                 running = False
                 if menu.return_click(e.pos) == 0:
                     switch_scene(game_world_draw)
-                    a = data_game
+                    data_game = 'data/maps/map_1.txt',
+                    while current_scene is not None:
+                        data_game = current_scene(data_game)
+                elif menu.return_click(e.pos) == 1:
+                    switch_scene(game_world_draw)
+                    data_game = 'data/maps/map_2.txt',
                     while current_scene is not None:
                         data_game = current_scene(data_game)
                 else:
@@ -131,9 +136,14 @@ def menu_draw(*args):
                     menu.switch(1)
                 elif e.key == pygame.K_SPACE:
                     running = False
-                    if menu.return_index() == 0:
+                    if menu.return_click(e.pos) == 0:
                         switch_scene(game_world_draw)
-                        a = data_game
+                        data_game = 'data/maps/map_1.txt',
+                        while current_scene is not None:
+                            data_game = current_scene(data_game)
+                    elif menu.return_click(e.pos) == 1:
+                        switch_scene(game_world_draw)
+                        data_game = 'data/maps/map_2.txt',
                         while current_scene is not None:
                             data_game = current_scene(data_game)
                     else:
@@ -441,6 +451,8 @@ def game_world_draw(*args):
 
     can_add_new_building = True if not flag_data else args[16]
 
+    hero_in_castle = False if not flag_data else args[16]
+
     def go_hero(map, steps_current_hero, current_fog, cam_y, cam_x, direction_y, direction_x, chr_to_replace=''):
         steps_current_hero -= 1
         if not chr_to_replace:
@@ -547,7 +559,9 @@ def game_world_draw(*args):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (-1, 0)
                     elif chr_go == '@' if players_hero[id_hero].chr == 'A' else '$':
-                        pass  # Слав тут нужно включить замок, тут игрок около него
+                        hero_in_castle = True
+
+
                 elif (e.key == pygame.K_DOWN or e.key == pygame.K_KP2) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero + 1][players_hero[id_hero].x_hero]
                     if chr_go == '-':
@@ -591,7 +605,9 @@ def game_world_draw(*args):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (1, 0)
                     elif chr_go == '@' if players_hero[id_hero].chr == 'A' else '$':
-                        pass  # Слав тут нужно включить замок, тут игрок около него
+                        hero_in_castle = True
+
+
                 elif (e.key == pygame.K_LEFT or e.key == pygame.K_KP4) and steps_current_hero:
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero - 1]
                     if chr_go == '-':
@@ -641,7 +657,9 @@ def game_world_draw(*args):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (0, -1)
                     elif chr_go == '@' if players_hero[id_hero].chr == 'A' else '$':
-                        pass  # Слав тут нужно включить замок, тут игрок около него
+                        hero_in_castle = True
+
+
                 elif (e.key == pygame.K_RIGHT or e.key == pygame.K_KP6) and steps_current_hero:
 
                     chr_go = map[players_hero[id_hero].y_hero][players_hero[id_hero].x_hero + 1]
@@ -685,7 +703,8 @@ def game_world_draw(*args):
                         preparation_window = 2, draw_preparation_window(players_hero[id_hero].slots_army,
                                                                         players_hero[::-1][id_hero].slots_army), (0, 1)
                     elif chr_go == '@' if players_hero[id_hero].chr == 'A' else '$':
-                        pass  # Слав тут нужно включить замок, тут игрок около него
+                        hero_in_castle = True
+
 
             if not preparation_window[0]:
                 for button in buttons:
@@ -813,7 +832,7 @@ def game_world_draw(*args):
             pygame.display.set_caption('FPS: ' + str(round(clock.get_fps())))
             chunks_on_screen((cam_x, cam_y), chunk_size, tile_size, res, (world_size_chunk_x, world_size_chunk_y))
     return link_map, (cam_x,
-                      cam_y), chunk_size, tile_size, map, one_player_fog_war, two_player_fog_war, world_size_chunk_x, world_size_chunk_y, sum_day, flag_player, players_hero, steps_current_hero, current_fog, frame, winner, can_add_new_building
+                      cam_y), chunk_size, tile_size, map, one_player_fog_war, two_player_fog_war, world_size_chunk_x, world_size_chunk_y, sum_day, flag_player, players_hero, steps_current_hero, current_fog, frame, winner, can_add_new_building, hero_in_castle
 
 
 def hero_characteristics(*args):
@@ -1483,8 +1502,8 @@ def castle_draw(*args):
                 t_1 = pygame.font.SysFont('arial', 45).render(description_2, True, (255, 255, 255))
                 screen.blit(t, (20, 850))
                 screen.blit(t_1, (20, 900))
-            elif (chosen_unit == '' and chosen_building != '' and building_value['lvl'] == 1 and (
-                    building_value[chosen_building] == 'no')):
+            elif (chosen_unit == '' and chosen_building != '' and building_value['lvl'] == 1 and chosen_building not in
+                  building_value.keys()):
                 price = cur.execute("""SELECT gold, wood, rock, magic_cristalls FROM castle_units 
                                                     WHERE name = ?""", (chosen_building,)).fetchone()
                 description_1 = f'{chosen_building_rus}: стоимость - {price[0]} золота,'
@@ -1522,7 +1541,7 @@ def castle_draw(*args):
     return args[0]
 
 
-switch_scene(game_world_draw)
+switch_scene(basic_menu_draw)
 data_game = 'data/maps/map_1.txt',
 while current_scene is not None:
     data_game = current_scene(data_game)
